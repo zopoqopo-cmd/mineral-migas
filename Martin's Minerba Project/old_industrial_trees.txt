@@ -1,0 +1,699 @@
+        const industrialTrees = {
+            nikel: {
+                title: "Rantai Nilai Nikel",
+                desc: "Hilirisasi nikel dengan terminologi industri metalurgi (RKEF & HPAL Process).",
+                tree: {
+                    id: "ni_input", name: "Bahan Baku Nikel", type: "hulu", desc: "Input utama industri nikel dari tambang dan daur ulang.",
+                    children: [
+                        {
+                            id: "hs_2604", name: "Nickel Ore Laterite (2604)", type: "hulu", process: "Open-pit Mining", requirements: "Alat Berat, Bahan Peledak (Opsional), Dump Truck", desc: "Bijih nikel laterit terbagi dua tipe utama: Saprolit (kadar Ni tinggi) dan Limonit (kadar Ni rendah).",
+                            children: [
+                                {
+                                    id: "hs_7501", name: "Nickel Matte & NPI (7501)", type: "antara", process: "Pyrometallurgy (Smelting)", requirements: "Batubara Metalurgi/Kokas (Reduktor), Batu Kapur (CaCO3) sebagai Flux, Listrik Arus Kuat", desc: "Produk antara metalurgi nikel dari jalur pirometalurgi.",
+                                    children: [
+                                        {
+                                            id: "hs_750110", name: "Nickel Matte (750110)", type: "antara", process: "Sulfiding Smelting", requirements: "Belerang (S) / Pyrite (FeS2), Udara Oksidasi", desc: "Produk antara dengan kadar nikel 75-78% dan sulfur tinggi, bahan dasar untuk kilang nikel murni.",
+                                            children: [
+                                                {
+                                                    id: "hs_7502", name: "Refined Nickel / Katoda (7502)", type: "antara", process: "Electrowinning / Carbonyl Process", requirements: "Asam Sulfat (H2SO4), Asam Borat (H3BO3), Katalis khusus, Listrik DC", desc: "Logam nikel murni (Class 1 Nickel) berupa katoda, briket, atau pellet.",
+                                                    children: [
+                                                        {
+                                                            id: "hs_750210", name: "Nickel Class 1 (750210)", type: "antara", process: "Refining", desc: "Nikel murni tak paduan berstandar LME (kadar Ni > 99.8%).",
+                                                            children: [
+                                                                { id: "hs_7504", name: "Nickel Powder & Flakes (7504)", type: "hilir", process: "Atomization / Hydrometallurgical reduction", requirements: "Gas Hidrogen (H2) bertekanan", desc: "Bahan pelapis kimia & pembentuk komponen metalurgi serbuk.", children: [{id: "app_batt_ni", name: "Baterai Ni-Cd/Ni-MH (8507)", type: "aplikasi", desc: "Serbuk nikel dicetak dan disinter menjadi matriks penyangga elektroda positif (katoda) di dalam sel baterai industri, perkakas listrik, dan kendaraan hybrid."}] },
+                                                                { id: "hs_7505_pure", name: "Nickel Wire & Rod (7505.11/21)", type: "hilir", process: "Extrusion & Wire Drawing", requirements: "Pelumas Drawing (Isopropanol/Oli khusus)", desc: "Konduktor presisi tinggi non-paduan.", children: [{id: "app_7505_pure", name: "Sensor & Konduktor Listrik", type: "aplikasi", desc: "Kawat nikel murni ditenun atau digulung menjadi komponen inti sensor presisi, terminal penghubung, dan konduktor elektronik yang menuntut ketahanan karat absolut."}] },
+                                                                { id: "hs_7506_pure", name: "Nickel Foil & Sheet (7506.10)", type: "hilir", process: "Cold Rolling", requirements: "Cairan Pendingin Emulsi", desc: "Lembaran tipis nikel murni.", children: [{id: "app_7506_pure", name: "Komponen Baterai & Kapasitor", type: "aplikasi", desc: "Lembaran nikel (foil) diaplikasikan sebagai pengumpul arus (current collector) penghubung antar sel baterai dan komponen tabung elektroda pada peralatan lab."}] },
+                                                                { id: "hs_7507_pure", name: "Nickel Tubing (7507.11)", type: "hilir", process: "Pilgering / Tube Extrusion", desc: "Pipa seamless murni tahan bahan kimia.", children: [{id: "app_7507_pure", name: "Peralatan Makanan & Farmasi", type: "aplikasi", desc: "Pipa nikel murni dirakit dan dilas menjadi sistem perpipaan higienis (food-grade) pabrik makanan/obat untuk mencegah kontaminasi silang dan korosi zat asam."}] }
+                                                            ]
+                                                        },
+                                                        {
+                                                            id: "hs_750220", name: "Nickel Superalloys (750220)", type: "antara", process: "Vacuum Induction Melting (VIM)", requirements: "Gas Argon (Ar), Logam Paduan (Kromium, Molybdenum, Besi)", desc: "Paduan nikel berperforma tinggi yang sangat tahan suhu ekstrem dan korosi.",
+                                                            children: [
+                                                                { id: "hs_7505_alloy", name: "Alloy Bar & Wire (7505.12/22)", type: "hilir", process: "Hot Rolling & Drawing", desc: "Produk panjang paduan nikel (contoh: Inconel, Monel).", children: [{id: "app_7505_alloy", name: "Elemen Pemanas & Termokopel", type: "aplikasi", desc: "Kawat paduan nikel (seperti Nichrome) digulung menjadi koil pemanas (heating element) pada tungku industri, serta menjadi probe pengukur pada kabel termokopel."}] },
+                                                                { id: "hs_7506_alloy", name: "Alloy Sheet & Cladding (7506.20)", type: "hilir", process: "Rolling & Cladding", desc: "Lembaran tahan korosi untuk tangki berat.", children: [{id: "app_7506_alloy", name: "Heat Exchanger & Reaktor Kimia", type: "aplikasi", desc: "Lembaran superalloy dipotong dan disusun menjadi bilah penukar panas (heat exchanger) dan lapisan dinding pelindung (cladding) di dalam reaktor kimia agresif."}] },
+                                                                { id: "hs_7507_alloy", name: "Alloy Pipe & Fittings (7507.12/20)", type: "hilir", process: "Forging & Machining", desc: "Termasuk flange, elbow, tee berbahan superalloy.", children: [{id: "app_7507_alloy", name: "Pipa Migas & Reaktor Nuklir", type: "aplikasi", desc: "Pipa dan fitting superalloy dirakit dengan baut/las menjadi jalur pipa bawah laut (sub-sea) rig minyak dan sistem pendingin primer pada reaktor nuklir yang anti-radiasi."}] },
+                                                                { id: "hs_7508", name: "Wire Mesh & Netting (7508)", type: "hilir", process: "Weaving", desc: "Kain kawat dan anyaman presisi paduan nikel.", children: [{id: "app_7508", name: "Filter Kimia Industri", type: "aplikasi", desc: "Anyaman kawat nikel dipasang pada bingkai baja sebagai membran penyaring utama (filter screen) pemisah partikel dari cairan korosif bersuhu tinggi."}] }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    id: "hs_283324", name: "Nickel Sulphate (283324)", type: "antara", process: "Solvent Extraction & Crystallization", requirements: "Asam Sulfat (H2SO4), NaOH (Pengatur pH), Extractant (ex: Cyanex 272)", desc: "Senyawa nikel sulfat hexahydrate (kristal hijau) untuk prekursor (PCAM).",
+                                                    children: [
+                                                        { id: "app_850760", name: "Li-ion Battery (NMC/NCA) (850760)", type: "aplikasi", desc: "Kristal nikel sulfat direaksikan menjadi PCAM, kemudian dipanggang bersama litium untuk membentuk serbuk katoda penyimpan daya utama pada sel baterai mobil listrik (EV)." }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            id: "hs_720260", name: "Ferronickel / NPI (720260)", type: "antara", process: "Rotary Kiln Electric Furnace (RKEF)", requirements: "Batubara Metalurgi, Batu Kapur (Dolomit)", desc: "Paduan nikel-besi mentah yang langsung disuplai ke pabrik baja.",
+                                            children: [
+                                                { id: "app_stainless", name: "Stainless Steel (Seri 300)", type: "aplikasi", desc: "Ferronickel/NPI dilebur langsung bersama kromium untuk mengunci struktur matriks kristal besi menjadi baja Austenitik yang mengkilap, tahan karat, dan diaplikasikan pada wastafel hingga pisau bedah." }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    id: "hs_750120", name: "Oxide Sinters (750120)", type: "antara", process: "Fluidized Bed Roasting", requirements: "Oksigen udara panas", desc: "Sinter oksida nikel dari tahap roasting bijih sulfida.",
+                                    children: [
+                                        { id: "hs_282540", name: "Oksida Nikel (282540)", type: "antara", desc: "Senyawa kimia oksida nikel.", children: [{id: "app_keramik", name: "Katalis, Kaca & Keramik", type: "aplikasi", desc: "Oksida nikel dicampurkan sebagai bahan pemberi pigmen warna (frit) pada industri kaca/keramik, atau diresapkan ke dalam pori substrat sebagai agen katalisator penyulingan migas."}] }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            id: "hs_7503", name: "Nickel Scrap & Waste (7503)", type: "hulu", process: "Pengepulan & Sortasi", desc: "Sisa industri fabrikasi dan baterai bekas untuk ekonomi sirkular.",
+                            children: [
+                                { id: "app_recycle_ni", name: "Secondary Nickel", type: "antara", process: "Hydrometallurgical Recycling (Black Mass)", requirements: "Asam Kuat, Reagen Solvent Extraction", desc: "Diurai dan dimurnikan kembali menjadi mineral garam nikel seperti Nikel Sulfat." }
+                            ]
+                        }
+                    ]
+                }
+            },
+            timah: {
+                title: "Rantai Nilai Timah",
+                desc: "Hilirisasi timah dengan spesifikasi produk akhir dan proses metalurgi Timah.",
+                tree: {
+                    id: "hs_2609", name: "Cassiterite Concentrate (2609)", type: "hulu", process: "Washing & Gravity Beneficiation", requirements: "Air Jumlah Besar, Flokulan (Opsional), Jig Separator", desc: "Bijih timah (kasiterit - SnO2) yang telah ditingkatkan kadarnya.",
+                    children: [
+                        {
+                            id: "hs_8001", name: "Tin Ingot / Timah Mentah (8001)", type: "antara", process: "Reverberatory Furnace Smelting", requirements: "Batu Bara/Antrasit (Reduktor), Batu Kapur (CaCO3) sebagai Flux", desc: "Logam timah batangan (Ingot) dengan kemurnian tinggi hasil peleburan.",
+                            children: [
+                                {
+                                    id: "hs_800110", name: "Refined Tin (800110)", type: "antara", process: "Crystallization / Electrorefining", desc: "Timah murni tidak dipadu, standar LME 99.85% Sn.",
+                                    children: [
+                                        {
+                                            id: "hs_7210_7212", name: "Tinplate (ETP) (7210/7212)", type: "hilir", process: "Electrolytic Tinning", requirements: "Baja Canai Dingin (CRC), Asam Sulfat / Metanesulfonat, Phenol Sulfonic Acid", desc: "Lembaran baja tipis yang disalut lapisan timah pelindung karat secara elektrolisa.",
+                                            children: [
+                                                { id: "app_721012", name: "Kemasan Makanan & Minuman", type: "aplikasi", desc: "Baja berlapis timah dipotong, di-roll menjadi silinder, dan disatukan (seaming) untuk membentuk badan kaleng (tin can) hampa udara guna melindungi makanan dari pembusukan dan toksisitas." },
+                                                { id: "app_721011", name: "Komponen Industri & Aerosol", type: "aplikasi", desc: "Pelat Tinplate dicetak press (deep drawing) menjadi tutup botol kaca (crown cork), komponen tangki BBM, serta tabung kuat penahan tekanan gas (seperti kaleng cat semprot aerosol)." }
+                                            ]
+                                        },
+                                        {
+                                            id: "hs_8005", name: "Tin Foil & Powder (8005)", type: "hilir", process: "Atomization & Fine Rolling", requirements: "Gas Inert (Nitrogen/Argon)", desc: "Timah dalam bentuk serbuk sangat halus atau lembaran menyerupai kertas.",
+                                            children: [{ id: "app_8005", name: "Pigmen Cat & Kapasitor Elektronik", type: "aplikasi", desc: "Timah foil tipis digulung bersama kertas/plastik insulasi menjadi pelat dielektrik pada tabung kapasitor listrik, sedangkan bentuk bubuknya dilarutkan menjadi senyawa penolak karat (anti-fouling) di cat lambung kapal." }]
+                                        }
+                                    ]
+                                },
+                                {
+                                    id: "hs_800120", name: "Tin Alloys (800120)", type: "antara", process: "Alloying Melting", requirements: "Logam Paduan (Timbal/Pb, Tembaga/Cu, Perak/Ag, Antimon/Sb)", desc: "Timah yang dipadu dengan logam lain untuk merekayasa titik leleh atau kekerasan.",
+                                    children: [
+                                        {
+                                            id: "hs_8003", name: "Tin Solder Alloy (8003)", type: "hilir", process: "Extrusion & Wire Drawing", requirements: "Flux (Rosin / Damar Kental)", desc: "Kawat solder (sering dicampur timbal atau bebas timbal / lead-free solder).",
+                                            children: [{ id: "app_8003", name: "Perakitan PCB (Printed Circuit Board)", type: "aplikasi", desc: "Kawat solder dilelehkan melalui mesin gelombang (wave soldering) atau mata solder untuk menciptakan ikatan konduktif dan jangkar mekanis yang menempelkan kaki-kaki cip semikonduktor di atas papan PCB." }]
+                                        },
+                                        {
+                                            id: "hs_8007", name: "Pewter Alloy (8007)", type: "hilir", process: "Casting & Machining", requirements: "Antimon (Sb), Tembaga (Cu)", desc: "Paduan timah yang lentur namun kuat untuk dikerjakan secara mekanis.",
+                                            children: [{ id: "app_8007", name: "Cenderamata & Kerajinan Logam", type: "aplikasi", desc: "Blok paduan Pewter dicairkan lalu dituang ke dalam cetakan cetakan silikon/logam, mengeras, lalu diukir dan dipoles menjadi barang jadi seperti piala, teko klasik, dan piring hias." }]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+            tembaga: {
+                title: "Rantai Nilai Tembaga",
+                desc: "Hilirisasi tembaga komprehensif berdasarkan klasifikasi presisi Kode HS 26, 74, dan 85.",
+                tree: {
+                    id: "cu_input", name: "Bahan Baku Tembaga", type: "hulu", desc: "Sumber utama material tembaga dari tambang murni, abu, dan daur ulang (scrap).",
+                    children: [
+                        {
+                            id: "hs_2603", name: "Copper Concentrate (2603)", type: "hulu", process: "Comminution & Froth Flotation", requirements: "Kolektor (ex: Xanthate), Frother (MIBC), Kapur/pH Modifier", desc: "Konsentrat mineral Chalcopyrite dengan kadar tembaga ditingkatkan menjadi ~25-30%.",
+                            children: [
+                                {
+                                    id: "hs_7401", name: "Copper Mattes (7401)", type: "antara", process: "Flash Smelting", requirements: "Fluks Silika (SiO2), Oksigen Murni", desc: "Cairan tembaga sulfida (matte) dengan kemurnian 50-70% hasil peleburan konsentrat tahap pertama.",
+                                    children: [
+                                        {
+                                            id: "hs_7402", name: "Anodes / Unrefined (7402)", type: "antara", process: "Converting & Fire Refining", requirements: "Reduktor Gas Alam / Minyak Residu", desc: "Tembaga lepuh (Blister, 98-99% Cu) yang dicetak menjadi lempengan anoda raksasa.",
+                                            children: [
+                                                {
+                                                    id: "hs_740311", name: "Refined Cathodes (7403.11)", type: "antara", process: "Electrorefining", requirements: "Asam Sulfat (H2SO4), Arus Listrik DC Besar, Katalis (Thiourea / Lem Tulang)", desc: "Plat katoda tembaga dengan tingkat kemurnian ekstrem Grade A (99.99%).",
+                                                    children: [
+                                                        {
+                                                            id: "hs_740312", name: "Copper Wire-bars (7403.12)", type: "antara", process: "Continuous Casting and Rolling (CCR)", requirements: "Isopropanol (Pelumas Pendingin Oksidasi)", desc: "Katoda dilebur dan dicetak memanjang kontinu menjadi batangan kawat dasar.",
+                                                            children: [
+                                                                {
+                                                                    id: "hs_7408", name: "Copper Wire (7408)", type: "hilir", process: "Wire Drawing", desc: "Kawat tembaga penampang padat hasil penarikan (drawing) dari tebal hingga super halus.",
+                                                                    children: [
+                                                                        { id: "hs_854411", name: "Winding Wire (8544.11)", type: "aplikasi", desc: "Kawat tembaga murni dilapisi enamel tipis lalu dililit rapat menjadi kumparan (stator/rotor) pendaya elektromagnetik pada dinamo motor listrik (EV), transformator tegangan, dan generator." },
+                                                                        { id: "hs_7413", name: "Stranded Cables (7413)", type: "aplikasi", desc: "Beberapa utas kawat tembaga dipilin (stranded) menjadi inti tebal dan fleksibel untuk kabel jaringan transmisi daya ekstra tinggi (SUTET) tanpa insulasi serta grounding sistem penangkal petir." }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            id: "hs_740313", name: "Copper Billets (7403.13)", type: "antara", process: "Billet Casting", desc: "Blok silinder tembaga murni yang siap diekstrusi atau ditekan paksa menjadi bentuk panjang berongga.",
+                                                            children: [
+                                                                {
+                                                                    id: "hs_7411", name: "Tubes & Pipes (7411)", type: "hilir", process: "Billet Piercing & Tube Extrusion", desc: "Pipa dan tabung tembaga mulus (seamless) yang tahan karat dan kuat menahan tekanan tinggi.",
+                                                                    children: [
+                                                                        { id: "hs_7412", name: "HVAC & Pipe Fittings (7412)", type: "aplikasi", desc: "Tabung dan pipa tembaga dipotong, ditekuk (bending), dan dilengkapi sambungan (fitting) tempa untuk membentuk jalur sirkulasi kondensor cairan penyejuk (freon) pada sistem pendingin udara (AC/Kulkas) serta distribusi gas medis." }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    id: "hs_7407", name: "Bars & Profiles (7407)", type: "hilir", process: "Hot Extrusion", desc: "Batangan dan profil struktural padat tanpa rongga berbahan tembaga murni.",
+                                                                    children: [
+                                                                        { id: "app_busbar", name: "Busbar Panel Listrik", type: "aplikasi", desc: "Batang tembaga (bars/rods) dipotong, dilubangi, dan dibaut ke dalam panel distribusi gardu induk bertindak sebagai konduktor busbar, mengalirkan arus tegangan tinggi dengan tahanan panas sangat rendah." }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            id: "hs_7409", name: "Plates, Sheets, Strip (7409)", type: "hilir", process: "Hot/Cold Rolling", desc: "Lembaran dan pelat tembaga dengan ketebalan di atas 0.15 mm hasil pengerolan ingot.",
+                                                            children: [
+                                                                {
+                                                                    id: "hs_7410", name: "Copper Foil (7410)", type: "hilir", process: "Precision Cold Rolling / Electrodeposition", desc: "Foil tembaga ultra-tipis dengan ketebalan di bawah 0.15 mm, seringkali dilaminasi bahan pelindung.",
+                                                                    children: [
+                                                                        { id: "app_pcb", name: "Printed Circuit Board (PCB) & Baterai", type: "aplikasi", desc: "Foil tembaga dilaminasi ke substrat isolator dan dietsa (etching) membentuk jalur kelistrikan mini pada papan sirkuit (PCB) laptop/HP, serta digulung berlapis sebagai pengumpul arus (current collector) di sisi anoda sel baterai Li-ion." }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            id: "hs_74032x", name: "Copper Alloys (7403.2x)", type: "antara", process: "Alloying & Melting", requirements: "Logam Aditif: Zinc/Seng, Tin/Timah, Nikel", desc: "Paduan tembaga dalam bentuk un-wrought ingot (Kuningan/Brass, Perunggu/Bronze, Cupro-nickel).",
+                                                            children: [
+                                                                {
+                                                                    id: "hs_alloy_parts", name: "Alloy Profiles, Plates, Tubes", type: "hilir", process: "Extrusion, Casting, Machining", desc: "Barang setengah jadi dari paduan tembaga yang mengutamakan kelenturan akustik, warna, atau ketahanan gesek.",
+                                                                    children: [
+                                                                        { id: "app_alloy", name: "Komponen Maritim & Instrumen", type: "aplikasi", desc: "Bahan paduan (seperti Kuningan & Cu-Ni) dibubut (machining) dan dibentuk menjadi instrumen musik tiup beresonansi tinggi, dicetak menjadi baling-baling kapal yang anti-teritip air laut, dan dipotong menjadi selongsong peluru amunisi." }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            id: "hs_7404", name: "Waste & Scrap (7404)", type: "hulu", process: "Pengepulan & Sortasi Mekanis", desc: "Kabel bekas, pipa rongsokan, dan sisa produksi pabrik (scrap) untuk mendaur ulang suplai material.",
+                            children: [
+                                {
+                                    id: "hs_7406", name: "Powders & Flakes (7406)", type: "hilir", process: "Gas/Water Atomization", desc: "Serbuk dan partikel bubuk tembaga murni hasil penyemprotan tembaga daur ulang/mentah yang dicairkan.",
+                                    children: [
+                                        { id: "app_powder", name: "Sintered Parts & Tinta Metalik", type: "aplikasi", desc: "Serbuk tembaga ditekan kuat ke dalam cetakan dan dipanggang (sintering) membentuk komponen logam rumit bersuhu tinggi (roda gigi kecil/bearing otomotif), atau dilarutkan ke dalam larutan polimer menjadi cat anti-fouling dan tinta elektromagnetik konduktif." }
+                                    ]
+                                },
+                                {
+                                    id: "hs_chem", name: "Copper Chemicals (2825/33)", type: "antara", process: "Chemical Dissolution & Leaching", requirements: "Asam Sulfat (H2SO4), Asam Klorida (HCl)", desc: "Senyawa mineral klorida, hidroksida, oksida, dan sulfat tembaga yang diekstrak secara kimiawi dari sisa abu (2620.30) atau scrap.",
+                                    children: [
+                                        { id: "app_agro", name: "Agrokimia & Pigmen Pewarna", type: "aplikasi", desc: "Senyawa tembaga sulfat dilarutkan menjadi larutan semprot fungisida (Bordeaux mixture) untuk mencegah hama jamur di perkebunan, disintesis menjadi cairan pengawet kayu konstruksi (anti-rayap), serta dicetak menjadi serbuk pigmen biru-kehijauan untuk pelapis industri keramik." }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+            bauksit: {
+                title: "Rantai Nilai Bauksit (Aluminium)",
+                desc: "Hilirisasi bauksit komprehensif berdasarkan klasifikasi Kode HS 26, 28, dan 76 hingga ke tingkat aplikasi produk manufaktur.",
+                tree: {
+                    id: "al_input", name: "Bahan Baku Aluminium", type: "hulu", desc: "Sumber utama material aluminium dari tambang laterit bauksit dan daur ulang (scrap).",
+                    children: [
+                        {
+                            id: "hs_2606", name: "Bauksit / Bauxite (2606)", type: "hulu", process: "Open-pit Mining & Washing", requirements: "Alat Berat, Air (Pencucian), Screen Separator", desc: "Tanah laterit yang kaya akan mineral aluminium oksida alami.",
+                            children: [
+                                {
+                                    id: "hs_281820", name: "Alumina / Aluminium Oksida (281820)", type: "antara", process: "Bayer Process", requirements: "Caustic Soda (NaOH), Kapur Tohor (CaO), Flocculant Polyacrylamide", desc: "Aluminium Oksida (Al2O3) berupa bubuk putih hasil pemurnian dari bijih bauksit.",
+                                    children: [
+                                        {
+                                            id: "hs_7601", name: "Unwrought Aluminium Ingot (7601)", type: "antara", process: "Hall-Héroult Electrolysis", requirements: "Cryolite (Na3AlF6), Aluminium Fluorida (AlF3), Anoda Karbon, Listrik Arus Kuat", desc: "Logam aluminium mentah cair yang dicetak dalam batangan (ingot) atau billet.",
+                                            children: [
+                                                {
+                                                    id: "hs_760110", name: "Aluminium Murni (760110)", type: "antara", process: "Casting", desc: "Ingot aluminium tanpa paduan tambahan.",
+                                                    children: [
+                                                        {
+                                                            id: "hs_7606_pure", name: "Pelat & Lembaran Murni (7606.11/91)", type: "hilir", process: "Hot & Cold Rolling", requirements: "Minyak Pelumas Pengerolan", desc: "Pelat/lembaran/strip aluminium murni datar atau gulungan (coil).",
+                                                            children: [
+                                                                {
+                                                                    id: "hs_7607", name: "Foil Aluminium (7607)", type: "hilir", process: "Precision Cold Rolling", desc: "Lembaran dengan ketebalan ≤ 0.2mm, bisa berupa plain (tanpa penguat) atau backed.",
+                                                                    children: [
+                                                                        { id: "app_7607", name: "Kemasan Farmasi & Makanan (7607.20)", type: "aplikasi", desc: "Foil aluminium dipres sangat tipis dan dilaminasi (ditempel) dengan plastik/kertas penyangga untuk membentuk bungkus obat (blister pack) atau kotak karton cair UHT, di mana lapisan aluminiumnya memblokir total cahaya, oksigen, dan bakteri pembusuk." }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            id: "hs_7605_pure", name: "Kawat Al Murni (7605.11/19)", type: "hilir", process: "Wire Drawing", desc: "Kawat dari aluminium murni.",
+                                                            children: [
+                                                                { id: "hs_7614", name: "Kabel Transmisi ACSR (7614)", type: "aplikasi", desc: "Kawat ditarik halus dan dipilin (stranded) mengelilingi inti kawat baja (ACSR - Aluminium Conductor Steel Reinforced) menjadi kabel listrik raksasa untuk jalur transmisi SUTET tegangan tinggi jarak jauh, memanfaatkan sifat aluminium yang sangat ringan dan konduktif." }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    id: "hs_760120", name: "Paduan Aluminium (760120)", type: "antara", process: "Alloying", requirements: "Magnesium (Mg), Silikon (Si), Tembaga (Cu), Seng (Zn)", desc: "Ingot aluminium yang dicampur logam lain untuk kekuatan dan ketahanan ekstra.",
+                                                    children: [
+                                                        {
+                                                            id: "hs_7604", name: "Batang & Profil Ekstrusi (7604)", type: "hilir", process: "Extrusion Pressing", desc: "Profil padat maupun berongga berbahan paduan aluminium.",
+                                                            children: [
+                                                                { id: "hs_7610", name: "Struktur Konstruksi & Kusen (7610)", type: "aplikasi", desc: "Billet aluminium dipanaskan dan ditekan (ekstrusi) melewati cetakan (die) menjadi profil berongga (hollow) memanjang. Profil ini kemudian dipotong dan dirakit menjadi kusen jendela, pintu arsitektural, hingga rangka jembatan dan atap ringan anti-karat." }
+                                                            ]
+                                                        },
+                                                        {
+                                                            id: "hs_7606_alloy", name: "Pelat & Lembaran Paduan (7606.12/92)", type: "hilir", process: "Rolling", desc: "Lembaran berkekuatan tinggi.",
+                                                            children: [
+                                                                { id: "hs_7612", name: "Wadah & Kaleng (7612)", type: "aplikasi", desc: "Lembaran paduan ditarik dalam (deep drawing process) dan dibentuk menjadi tabung silinder utuh, lalu ditutup (seaming), menjadi kaleng minuman (beverage can), wadah aerosol, atau kotak makanan kaku yang kedap udara." },
+                                                                { id: "hs_7615", name: "Peralatan Rumah Tangga (7615)", type: "aplikasi", desc: "Pelat aluminium ditekan paksa (press/stamping) pada cetakan baja (mold) untuk membentuk cekungan menjadi panci, wajan, dan wastafel dapur yang memiliki distribusi panas merata dan anti-lengket (setelah di-coating)." }
+                                                            ]
+                                                        },
+                                                        {
+                                                            id: "hs_7608", name: "Pipa & Tabung Paduan (7608/7609)", type: "hilir", process: "Billet Piercing", desc: "Pipa tahan tekanan berserta fitting-nya.",
+                                                            children: [
+                                                                { id: "hs_7613", name: "Tabung Gas Aluminium (7613)", type: "aplikasi", desc: "Pipa tebal dan ingot aluminium diekstrusi terbalik (backward extrusion) menjadi silinder tanpa kampuh las (seamless) yang sanggup menahan tekanan udara ekstrem di dalam tabung oksigen selam (scuba) dan tabung pemadam api portabel." }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    id: "hs_7603", name: "Bubuk & Serpihan (7603)", type: "hilir", process: "Atomization / Milling", desc: "Bubuk non-lamellar atau serpihan (lamellar) aluminium.",
+                                                    children: [
+                                                        { id: "app_321290", name: "Pigmen Cat & Bahan Peledak (321290)", type: "aplikasi", desc: "Serpihan tipis aluminium disebarkan ke dalam cairan pelarut (solvent/resin) sebagai agen pemantul cahaya, memberikan efek kilap (metalik) yang merata pada cat bodi otomotif. Dalam bentuk kering, bubuk ini dicampur ke oksidan menjadi bahan aktif propelan pendorong/kembang api." }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            id: "hs_281830", name: "Aluminium Hidroksida (281830)", type: "antara", process: "Precipitation", desc: "Produk turunan awal alumina sebelum dikalsinasi.",
+                                            children: [
+                                                { id: "hs_283322", name: "Aluminium Sulfat (283322)", type: "aplikasi", desc: "Aluminium hidroksida direaksikan dengan asam sulfat encer menjadi padatan kristal Tawas/Alum. Senyawa ini dilarutkan ke air baku PDAM dan limbah kertas bertindak sebagai agen koagulan yang mengikat kotoran (flok) sehingga lumpur mengendap dan air menjadi jernih." }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            id: "hs_7602", name: "Scrap & Sisa Aluminium (7602)", type: "hulu", process: "Pengepulan & Sortasi Mekanis", desc: "Produk bekas pakai (kaleng, velg) dan sisa potongan pabrik manufaktur.",
+                            children: [
+                                { id: "app_recycle_al", name: "Aluminium Sekunder", type: "antara", process: "Remelting (Peleburan Ulang)", requirements: "Tungku Reverb (Reverberatory Furnace), Gas Alam", desc: "Potongan scrap dilebur ulang menjadi ingot sekunder. Proses daur ulang ini menghemat hingga 95% energi listrik dibandingkan jika harus memproses dari tanah bauksit awal." }
+                            ]
+                        }
+                    ]
+                }
+            },
+            besi: {
+                title: "Rantai Nilai Besi & Baja",
+                desc: "Rantai pasok industri besi baja sebagai material tulang punggung infrastruktur.",
+                tree: {
+                    id: "fe_1", name: "Iron Ore Pellet / Sinter", type: "hulu", process: "Beneficiation & Pelletizing", requirements: "Bentonite (sebagai Binder/Perekat), Batu Kapur / Dolomit", desc: "Bijih besi yang dipadatkan bulat/sinter agar permeabel saat masuk tungku.",
+                    children: [{
+                        id: "fe_2", name: "Crude Steel (Billet/Slab/Bloom)", type: "antara", process: "Blast Furnace (BF) + Basic Oxygen Furnace (BOF) atau EAF", requirements: "Kokas / Batubara Metalurgi, Oksigen Murni, Kapur Dolomit, Elektroda Grafit (jika EAF)", desc: "Baja mentah setengah jadi yang siap di-roll panas.",
+                        children: [{
+                            id: "fe_3", name: "Rebar (Baja Tulangan) & Wire Rod", type: "hilir", process: "Hot Rolling Mill", desc: "Besi profil berulir (deformed bar) dan kawat gulungan untuk struktur tarik.",
+                            children: [{ id: "fe_4", name: "Konstruksi Infrastruktur Sipil", type: "aplikasi", desc: "Baja tulangan (rebar) dipotong ke panjang tertentu dan dirangkai menyilang menggunakan ikatan kawat bendrat membentuk kerangka penulangan beton (bekisting dalam). Kerangka baja ini kemudian dikubur utuh dengan cor beton semen basah dan mengeras, berfungsi memikul semua beban tarik dan gaya geser (yang tak bisa ditahan oleh beton murni) pada fondasi jalan, gelagar jembatan beton, dan kolom pilar gedung pencakar langit." }]
+                        }]
+                    }]
+                }
+            },
+            silika: {
+                title: "Rantai Nilai Pasir Silika & Kuarsa",
+                desc: "Hilirisasi pasir silika dan batuan kuarsa, bermula dari industri kaca dasar hingga menyuplai komponen teknologi semikonduktor canggih (Kode HS 25, 28, 38, 69, 70, 72, 85, 90).",
+                tree: {
+                    id: "si_input", name: "Bahan Baku Silika", type: "hulu", desc: "Sumber daya alam berbasis silikon dioksida (SiO2) dari alam.",
+                    children: [
+                        {
+                            id: "hs_250510", name: "Pasir Silika & Kuarsa Alam (2505.10/90)", type: "hulu", process: "Pencucian & Pemisahan Magnetik", requirements: "Air Jumlah Besar, Flotasi Asam (opsional untuk membuang unsur besi)", desc: "Butiran pasir kuarsa dengan kadar SiO2 sangat tinggi yang telah dibersihkan dari pengotor besi agar tidak merusak warna pada produk akhir.",
+                            children: [
+                                {
+                                    id: "hs_7001", name: "Massa Kaca & Pecahan (7001.00)", type: "antara", process: "Furnace Melting (Peleburan Kaca)", requirements: "Soda Ash (Penurun Titik Leleh), Limestone/Batu Kapur (Penstabil), Gas Alam", desc: "Campuran pasir silika yang telah dilebur menjadi cairan kaca atau didinginkan menjadi bongkahan massa kaca (termasuk pecahan cullet yang didaur ulang).",
+                                    children: [
+                                        {
+                                            id: "hs_7005", name: "Kaca Lembaran / Float Glass (7005)", type: "hilir", process: "Float Glass Process", requirements: "Kolam Timah Cair (Tin Bath), Gas Nitrogen/Hidrogen", desc: "Kaca cair dialirkan mengapung di atas lelehan timah rata sehingga menghasilkan lembaran kaca dasar yang sangat datar tanpa gelombang.",
+                                            children: [
+                                                { id: "app_7005", name: "Kaca Arsitektur & Pelindung Panel Surya", type: "aplikasi", desc: "Lembaran kaca (float glass) dipotong, di-tempering agar kuat menahan benturan, lalu dilapisi bahan anti-reflektif sebelum dipasang sebagai kaca fasad gedung pencakar langit atau sebagai kaca pelindung utama pada permukaan modul sel surya (PV)." }
+                                            ]
+                                        },
+                                        {
+                                            id: "hs_701090", name: "Botol & Wadah Kaca (7010.90)", type: "hilir", process: "Blow Molding / Press and Blow", desc: "Kaca cair (gob) dijatuhkan ke dalam cetakan cetakan besi, lalu ditiup paksa menggunakan tekanan udara hingga membentuk rongga.",
+                                            children: [
+                                                { id: "app_701090", name: "Kemasan Makanan & Farmasi", type: "aplikasi", desc: "Botol dan toples kaca disterilisasi dan digunakan langsung di jalur pengemasan pabrik sebagai wadah kedap udara yang 100% inert (tidak bereaksi secara kimiawi) untuk mengawetkan minuman, makanan, hingga ampul cairan vaksin farmasi." }
+                                            ]
+                                        },
+                                        {
+                                            id: "hs_7019", name: "Serat Kaca / Fiberglass (7019)", type: "hilir", process: "Fiber Spinning / Drawing", requirements: "Platinum Bushing (Cetakan Tahan Panas Ekstrem)", desc: "Kaca cair ditarik cepat melalui lubang mikroskopis menjadi helaian serat tipis yang sangat kuat terhadap tarikan.",
+                                            children: [
+                                                { id: "app_701911", name: "Insulator Bangunan & Material Komposit", type: "aplikasi", desc: "Helaian serat kaca dipintal secara acak membentuk lembaran wool kaca (glass wool) penyerap suara dan penahan panas pada dinding ruang gema. Selain itu, untaiannya juga dianyam lalu dicor bersama resin epoxy untuk mencetak bodi perahu dan lambung komposit yang super ringan namun kebal terhadap korosi laut." }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    id: "hs_281122", name: "Silikon Dioksida Murni (2811.22)", type: "antara", process: "Chemical Purification & Synthesis", requirements: "Bahan Kimia Asam/Basa Kuat", desc: "Serbuk SiO2 ultra murni kelas kimia yang diekstrak secara spesifik.",
+                                    children: [
+                                        {
+                                            id: "hs_381800", name: "Wafer Silikon Berdoping (3818.00)", type: "hilir", process: "Czochralski Method & Diamond Slicing", requirements: "Gas Hidrogen (H2), Gas Argon (Ar), Bahan Dopant (Fosfor/Boron)", desc: "Batangan kristal silikon raksasa silindris (ingot) diiris tipis menjadi lempengan wafer semi-konduktif.",
+                                            children: [
+                                                { id: "hs_854231", name: "Sirkuit Terpadu / Microchip (8542.31)", type: "aplikasi", desc: "Permukaan wafer silikon dicetak melalui mesin fotolitografi beresolusi nano dan di-etsa (etching) menggunakan cairan/gas asam reaktif di dalam Clean Room. Proses ini mengukir miliaran transistor mikroskopis pada sepotong kecil silikon, yang kemudian dipotong dan dirakit menjadi 'otak' (CPU/Chip) pintar untuk komputer, mobil listrik (EV), dan ponsel cerdas." }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    id: "hs_7202_si", name: "Ferro-silikon (7202.21/29)", type: "antara", process: "Submerged Arc Furnace (SAF)", requirements: "Elektroda Karbon, Scrap Baja/Besi (Sumber Fe), Kokas (Reduktor)", desc: "Logam paduan besi (iron) dan silikon hasil peleburan pasir kuarsa murni di tungku listrik raksasa bersuhu tinggi.",
+                                    children: [
+                                        { id: "app_7202_si", name: "Baja Tahan Karat & Paduan Baja", type: "aplikasi", desc: "Bongkahan paduan Ferro-silikon dilemparkan ke dalam kuali tungku lelehan baja mentah bertindak sebagai agen deoksidasi yang secara agresif menarik oksigen keluar dari cairan baja. Pembersihan oksigen ini mutlak diperlukan untuk mencegah pori-pori/gelembung di dalam struktur baja paduan otomotif maupun baja tahan karat (stainless steel)." }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            id: "hs_250620", name: "Batuan Kuarsa & Kuarsit (2506.10/20)", type: "hulu", process: "Crushing & Milling", requirements: "Jaw Crusher, Ball Mill", desc: "Bongkahan batuan padat kuarsit (hasil metamorfosis batu pasir kuarsa) dan kristal kuarsa murni.",
+                            children: [
+                                {
+                                    id: "hs_690220", name: "Bata Tahan Api Silika (6902.20)", type: "hilir", process: "Pressing & Kiln Firing", requirements: "Kapur/Lime (Sebagai pengikat mekanis)", desc: "Batu bata industri khusus berbahan silika kasar (>50% SiO2) yang dirancang untuk tidak mencair pada suhu neraka.",
+                                    children: [
+                                        { id: "app_690220", name: "Lapisan Tungku Industri Suhu Tinggi", type: "aplikasi", desc: "Batu bata silika disusun merekat membentuk dinding pelindung internal (refractory lining) pada tungku pembuatan baja raksasa (blast furnace) serta kubah oven kokas industri. Bata ini menjadi perisai utama agar baja dari kerangka luar pabrik tidak ikut meleleh akibat paparan suhu logam cair di atas 1.500 Derajat Celcius." }
+                                    ]
+                                },
+                                {
+                                    id: "hs_900190", name: "Lensa Optik & Prisma (9001.90)", type: "hilir", process: "Precision Melting & Polishing", requirements: "Tungku Oksihidrogen Bersih / Crucible Kuarsa", desc: "Kaca kuarsa murni (fused silica) tanpa gelembung yang dipotong dan digosok mikro.",
+                                    children: [
+                                        { id: "app_900190", name: "Kamera Presisi & Instrumen Lab", type: "aplikasi", desc: "Kaca kuarsa dibentuk melengkung dan digosok menggunakan bubuk abrasif nano hingga mencapai kebeningan absolut, sebelum dipasang sebagai susunan lensa penangkap gambar di satelit teleskop angkasa luar, lensa kamera sinematik, serta jendela kaca tembus pandang sinar Ultra-Violet (UV) pada mesin laboratorium spektrometer." }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            id: "hs_251200", name: "Tanah Fosil Diatomite (2512.00)", type: "hulu", process: "Drying & Calcination", desc: "Endapan cangkang fosil ganggang diatom bersel tunggal purba yang sangat berpori dan tersusun atas silika.",
+                            children: [
+                                { id: "app_251200", name: "Bahan Filtrasi Industri & Penyerap", type: "aplikasi", desc: "Serbuk diatomite dipanggang (kalsinasi) dan dituangkan ke dalam mesin saringan pabrik bertindak sebagai filter filter aid mikroskopis penahan partikel kotor. Proses ini menjernihkan produk cair mulai dari minyak goreng komersial, sirup, hingga bir gandum. Karakter porositasnya juga dicetak menjadi material pelapis penyekat panas pada pipa industri gas." }
+                            ]
+                        }
+                    ]
+                }
+            },
+            gas_alam: {
+                title: "Rantai Nilai Gas Alam & Petrokimia",
+                desc: "Hilirisasi komprehensif gas bumi mencakup jalur Syngas, Amonia, Metanol, serta Fraksionasi Olefin pembentuk plastik dan karet sintetis (60+ Node).",
+                tree: {
+                    id: "hs_2711", name: "Gas Alam / Petroleum Gases (2711)", type: "hulu", desc: "Gas bumi ekstraksi yang kaya akan metana dan hidrokarbon ringan lainnya.",
+                    children: [
+                        {
+                            id: "hs_271121", name: "Gas Alam Pipa (271121)", type: "hulu", process: "Pipa Transmisi", desc: "Gas alam yang dialirkan dalam bentuk gas.",
+                            children: [
+                                { id: "hs_280429", name: "Rare Gases / Helium (280429)", type: "antara", desc: "Helium untuk Industri Medis & Pengelasan khusus." }
+                            ]
+                        },
+                        {
+                            id: "hs_271111", name: "Gas Alam Cair / LNG (271111)", type: "hulu", process: "Liquefaction", desc: "Gas didinginkan ekstrem menjadi fase cair (LNG).",
+                            children: [
+                                {
+                                    id: "hs_280300", name: "Carbon Black (280300)", type: "hilir", process: "Incomplete Combustion", desc: "Jelaga karbon murni hitam pekat.",
+                                    children: [
+                                        { id: "app_cb", name: "Ban Otomotif & Tinta (4011, 3215)", type: "aplikasi", desc: "Penguat matriks vulkanisir karet dan pigmen tinta printer." }
+                                    ]
+                                },
+                                {
+                                    id: "hs_270500", name: "Syngas / Gas Sintesis (270500)", type: "antara", process: "Steam Methane Reforming (SMR)", requirements: "Uap Air Bertekanan (H2O), Katalis Berbasis Nikel", desc: "Campuran gas karbon monoksida (CO) dan Hidrogen murni.",
+                                    children: [
+                                        {
+                                            id: "hs_280410", name: "Hidrogen (280410)", type: "antara", desc: "Hidrogen kemurnian tinggi dari syngas.",
+                                            children: [
+                                                {
+                                                    id: "hs_281410", name: "Amonia Anhidrat (281410)", type: "antara", process: "Proses Haber-Bosch", requirements: "Gas Nitrogen (N2), Katalis Besi", desc: "Amonia tanpa air.",
+                                                    children: [
+                                                        { id: "hs_281420", name: "Larutan Amonia (281420)", type: "antara", desc: "Amonia dilarutkan dalam air (Aqueous ammonia)." },
+                                                        {
+                                                            id: "hs_280800", name: "Asam Nitrat (280800)", type: "antara", desc: "Asam nitrat pekat.",
+                                                            children: [
+                                                                { id: "hs_310230", name: "Amonium Nitrat (310230)", type: "hilir", desc: "Senyawa nitrat kaya oksigen.", children: [{ id: "app_anfo", name: "Bahan Peledak Tambang (ANFO)", type: "aplikasi", desc: "Bahan baku peledak sipil komersial untuk pertambangan." }] }
+                                                            ]
+                                                        },
+                                                        { id: "hs_310221", name: "Amonium Sulfat / ZA (310221)", type: "hilir", desc: "Pupuk ZA untuk pertanian.", children: [{ id: "app_za", name: "Pupuk Pertanian", type: "aplikasi", desc: "Disebar langsung oleh petani ke lahan tanam." }] },
+                                                        {
+                                                            id: "hs_310210", name: "Urea (310210)", type: "hilir", process: "Sintesis Urea", requirements: "Gas Karbondioksida (CO2)", desc: "Pupuk padat kaya nitrogen.",
+                                                            children: [
+                                                                { id: "app_urea", name: "Pupuk Urea Konsumen", type: "aplikasi", desc: "Nutrisi pokok sumber nitrogen tanaman pangan." },
+                                                                { id: "hs_293361", name: "Melamin (293361)", type: "aplikasi", desc: "Bahan polimer resin keras untuk pelapis meja (HPL) & piring anti-pecah." }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            id: "hs_290511", name: "Metanol (290511)", type: "antara", process: "Katalisis Bertekanan", requirements: "Katalis Tembaga/Zinc Oksida", desc: "Alkohol paling sederhana (Methyl alcohol).",
+                                            children: [
+                                                { id: "hs_291211", name: "Formaldehida (291211)", type: "hilir", desc: "Gas turunan metanol.", children: [{ id: "app_form", name: "Resin & Perekat Kayu", type: "aplikasi", desc: "Bahan utama perekat lem kayu industri lapis (plywood/MDF)." }] },
+                                                { id: "hs_291521", name: "Asam Asetat (291521)", type: "hilir", process: "Karbonilasi Metanol", desc: "Bahan penyusun asam organik.", children: [{ id: "app_pta", name: "Industri PTA & Tekstil", type: "aplikasi", desc: "Pelarut pembuatan bahan pakaian PET (Polyester)." }] }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    id: "hs_ngl", name: "Fraksi Gas NGL & Olefin", type: "antara", process: "Fractionation & Gas Cracking", requirements: "Furnace Thermal Cracking", desc: "Pemisahan gas berat (C2-C4) direngkah menjadi monomer dasar plastik.",
+                                    children: [
+                                        {
+                                            id: "hs_271114", name: "Ethane / Ethylene Mix (271114)", type: "antara", desc: "Campuran etana & etilena cair.",
+                                            children: [
+                                                {
+                                                    id: "hs_290121", name: "Etilena / Ethylene (290121)", type: "antara", desc: "Molekul C2 tak jenuh pondasi industri petrokimia.",
+                                                    children: [
+                                                        {
+                                                            id: "hs_3901", name: "Polyethylene / PE (3901)", type: "hilir", process: "Polimerisasi Katalitik", desc: "Biji plastik primer polietilena.",
+                                                            children: [
+                                                                { id: "hs_390110", name: "LDPE / LLDPE (390110)", type: "aplikasi", desc: "Dicetak menjadi botol lentur, kantong kresek, geomembran." },
+                                                                { id: "hs_390120", name: "HDPE (390120)", type: "aplikasi", desc: "Dicetak menjadi jerigen tebal, pipa air bertekanan bawah tanah." }
+                                                            ]
+                                                        },
+                                                        {
+                                                            id: "hs_290321", name: "Vinyl Chloride / VCM (290321)", type: "hilir", process: "Oksiklorinasi", requirements: "Gas Klorin (Cl2)", desc: "Monomer terhalogenasi penyusun PVC.",
+                                                            children: [
+                                                                { id: "hs_390410", name: "Plastik PVC (390410)", type: "aplikasi", desc: "Pipa Paralon perumahan, insulasi kabel listrik (8544), panel plafon." }
+                                                            ]
+                                                        },
+                                                        {
+                                                            id: "hs_290250", name: "Stirena / Styrene (290250)", type: "hilir", process: "Alkilasi Benzena", desc: "Senyawa aromatik cair berminyak.",
+                                                            children: [
+                                                                { id: "hs_390311", name: "Polystyrene EPS (390311)", type: "aplikasi", desc: "Plastik mengembang (Styrofoam) peredam kejut & insulasi panas." },
+                                                                { id: "hs_390319", name: "Solid Polystyrene (390319)", type: "aplikasi", desc: "Industri plastik kaku / wadah bening." }
+                                                            ]
+                                                        },
+                                                        {
+                                                            id: "hs_291010", name: "Ethylene Oxide (291010)", type: "antara", desc: "Turunan oksigen etilena.",
+                                                            children: [
+                                                                { id: "hs_290531", name: "Ethylene Glycol / MEG (290531)", type: "hilir", desc: "Diol penyusun Polyester.", children: [{ id: "app_meg", name: "Tekstil PET & Baju", type: "aplikasi", desc: "Dipintal menjadi benang kain Polyester." }] }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            id: "hs_271112", name: "Propana / Propane (271112)", type: "antara", desc: "Gas Propana Cair.",
+                                            children: [
+                                                {
+                                                    id: "hs_290122", name: "Propilena / Propene (290122)", type: "antara", desc: "Molekul C3 pembentuk plastik titik leleh tinggi.",
+                                                    children: [
+                                                        { id: "hs_390210", name: "Polypropylene / PP (390210)", type: "hilir", process: "Polimerisasi Ziegler-Natta", desc: "Biji plastik tangguh anti sobek.", children: [{ id: "app_pp", name: "Dashboard Otomotif & Karung", type: "aplikasi", desc: "Dashboard mobil, bumper ringan, tali kuat, lapisan masker medis." }] },
+                                                        { id: "hs_291020", name: "Propylene Oxide (291020)", type: "hilir", desc: "Bahan resin epoksi.", children: [{ id: "app_po", name: "Busa Polyurethane", type: "aplikasi", desc: "Kasur busa, insulasi jok mobil." }] },
+                                                        { id: "hs_290512", name: "Isopropanol / IPA (290512)", type: "hilir", desc: "Alkohol pelarut industri.", children: [{ id: "app_ipa", name: "Pelarut & Hand Sanitizer", type: "aplikasi", desc: "Digunakan di industri farmasi dan medis." }] },
+                                                        { id: "hs_291611", name: "Asam Akrilat (291611)", type: "aplikasi", desc: "Polimer SAP (Superabsorbent Polymer) penyerap cairan 300x untuk popok bayi." },
+                                                        { id: "hs_292610", name: "Acrylonitrile (292610)", type: "hilir", desc: "Sintesis plastik keras.", children: [{ id: "app_abs", name: "Plastik ABS / Karet NBR", type: "aplikasi", desc: "Material helm, casing elektronik, dan sarung tangan tahan minyak." }] }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            id: "hs_271113", name: "Butana / Butanes (271113)", type: "antara", desc: "Gas Butana Cair (LPG).",
+                                            children: [
+                                                { id: "hs_290123", name: "Butilena / Butene (290123)", type: "antara", desc: "Isomer C4 untuk modifikasi polimer plastik." },
+                                                {
+                                                    id: "hs_290124", name: "Butadiena & Isoprena (290124)", type: "antara", desc: "Hidrokarbon C4 berdiena.",
+                                                    children: [
+                                                        {
+                                                            id: "hs_4002", name: "Karet Sintetis (4002)", type: "hilir", process: "Kopolimerisasi Emulsi", requirements: "Campuran dengan Stirena (290250)", desc: "Pengganti getah pohon karet yang super tahan aus.",
+                                                            children: [
+                                                                { id: "hs_400211", name: "SBR Latex (400211)", type: "aplikasi", desc: "Karet cair (Lateks SBR) untuk industri pelapis dan perekat aspal." },
+                                                                { id: "hs_400219", name: "SBR Padat (400219)", type: "aplikasi", desc: "Tapak luar keras ban otomotif & sol alas kaki." },
+                                                                { id: "hs_400220", name: "Butadiene Rubber / BR (400220)", type: "aplikasi", desc: "Karet murni penahan gesekan ekstrem ban." }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+            minyak_bumi: {
+                title: "Rantai Nilai Minyak Bumi (Petroleum)",
+                desc: "Hilirisasi minyak bumi mentah menjadi bahan bakar, aspal, hingga rantai petrokimia penyusun resin plastik dan karet sintetis otomotif.",
+                tree: {
+                    id: "hs_270900", name: "Minyak Bumi Mentah (270900)", type: "hulu", process: "Pengeboran & Ekstraksi Laut Dalam", desc: "Petroleum oils and oils obtained from bituminous minerals, crude.",
+                    children: [
+                        {
+                            id: "hs_271019", name: "Distilat Menengah & Berat (271019)", type: "antara", process: "Distilasi Fraksional", desc: "Mencakup Solar/Diesel, Avtur, Kerosene, dan minyak dasar (base oil).",
+                            children: [
+                                { id: "app_bbm_berat", name: "Bahan Bakar & Biodiesel (271020)", type: "aplikasi", desc: "Konsumsi langsung untuk kendaraan diesel tugas berat, mesin kapal, dan avtur pesawat terbang." },
+                                {
+                                    id: "hs_2712", name: "Lilin Minyak Bumi (2712)", type: "hilir", process: "De-waxing Minyak Pelumas", desc: "Produk turunan dari fraksi minyak berat.",
+                                    children: [
+                                        { id: "hs_271210", name: "Petroleum Jelly / Vaseline (271210)", type: "aplikasi", desc: "Zat pelembab pelindung kulit untuk industri kosmetik dan salep farmasi." },
+                                        { id: "hs_271220", name: "Paraffin Wax (271220)", type: "aplikasi", desc: "Lilin parafin untuk industri pembuatan lilin penerangan dan pelapis kemasan tahan air." }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            id: "hs_2713", name: "Residu Minyak Bumi (2713)", type: "antara", process: "Coking & Vacuum Distillation", desc: "Sisa penyulingan paling bawah yang padat/kental.",
+                            children: [
+                                { id: "hs_271320", name: "Aspal / Bitumen (271320)", type: "aplikasi", desc: "Bahan pengikat hitam lengket utama dalam konstruksi dan pelapisan jalan raya." },
+                                {
+                                    id: "hs_271311", name: "Petcoke Mentah (271311)", type: "hilir", desc: "Kokas minyak bumi murni belum dipanggang, digunakan sebagai bahan bakar tungku pabrik semen.",
+                                    children: [
+                                        { id: "hs_271312", name: "Calcined Petcoke (271312)", type: "aplikasi", desc: "Kokas yang dipanggang (kalsinasi), krusial sebagai bahan baku pembuatan balok anoda pada smelter Elektrolisis Aluminium." }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            id: "hs_2711_lpg", name: "LPG & Gas Kilang (2711)", type: "antara", process: "Gas Recovery & Fraksionasi", desc: "Gas hidrokarbon ringan yang didinginkan hingga mencair.",
+                            children: [
+                                { id: "hs_271112", name: "Propana Cair (271112)", type: "aplikasi", desc: "Bahan bakar gas propana konsumen." },
+                                { id: "hs_271113", name: "Butana Cair (271113)", type: "aplikasi", desc: "Bahan bakar utama pada tabung kompor gas LPG dan gas propelan aerosol." }
+                            ]
+                        },
+                        {
+                            id: "hs_271012", name: "Naphtha & Light Oils (271012)", type: "antara", process: "Distilasi Fraksi Ringan", desc: "Bensin ringan (Gasoline) dan Naphtha cair, bertindak sebagai tulang punggung utama seluruh bahan petrokimia industri.",
+                            children: [
+                                {
+                                    id: "hs_aromatik", name: "Jalur Aromatik (Senyawa Cincin)", type: "antara", process: "Catalytic Reforming", desc: "Perengkahan Naphtha menjadi senyawa hidrokarbon siklik bernilai tinggi.",
+                                    children: [
+                                        {
+                                            id: "hs_290220", name: "Benzena murni (290220)", type: "antara", desc: "Senyawa dasar cincin aromatik utama berwujud cairan bening.",
+                                            children: [
+                                                { id: "hs_381700", name: "Linear Alkyl Benzene / LAB (381700)", type: "aplikasi", desc: "Bahan baku kimia aktif pemberi daya bersih pada sabun deterjen cair dan bubuk rumah tangga." },
+                                                {
+                                                    id: "hs_290270", name: "Kumena (290270)", type: "hilir", requirements: "Reaksi dengan Propilena (290122)", desc: "Cairan hidrokarbon tak berwarna turunan alkilasi benzena.",
+                                                    children: [
+                                                        { id: "hs_291411", name: "Aseton (291411)", type: "aplikasi", desc: "Bahan pelarut (solvent) kuat yang digunakan di industri plastik akrilik, lem, dan cat." },
+                                                        {
+                                                            id: "hs_290711", name: "Fenol (290711)", type: "hilir", desc: "Turunan karbolat aromatik hasil oksidasi kumena.",
+                                                            children: [
+                                                                { id: "hs_390940", name: "Resin Fenolik (390940)", type: "aplikasi", desc: "Perekat rekat tinggi antiair yang dicampurkan saat mengepres lembaran kayu menjadi Plywood (kayu lapis) komersial." },
+                                                                {
+                                                                    id: "hs_293371", name: "Epsilon-Kaprolaktam (293371)", type: "hilir", desc: "Monomer amida turunan benzena/fenol.",
+                                                                    children: [
+                                                                        { id: "hs_390810", name: "Plastik Polyamide-6 / Nylon (390810)", type: "aplikasi", desc: "Plastik tangguh dan tahan panas untuk dipintal menjadi serat benang nilon, hingga dicetak menjadi komponen gir (roda gigi) otomotif pengganti logam." }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            id: "hs_290243", name: "Para-Xilena / p-Xylene (290243)", type: "antara", desc: "Isomer xilena yang sangat reaktif dan paling berharga secara komersial.",
+                                            children: [
+                                                {
+                                                    id: "hs_291736", name: "Asam Tereftalat Murni / PTA (291736)", type: "hilir", process: "Oksidasi p-Xilena", desc: "Serbuk putih prekursor utama rantai plastik poliester.",
+                                                    children: [
+                                                        { id: "hs_390761", name: "PET Resin Botol Air (390761)", type: "aplikasi", requirements: "Reaksi dengan Ethylene Glycol / MEG (290531)", desc: "Biji plastik Polyethylene Terephthalate kental tinggi untuk dicetak-tiup (blow molding) menjadi botol air mineral dan kemasan minuman tembus pandang." },
+                                                        { id: "hs_390769", name: "Serat Polyester (390769)", type: "aplikasi", requirements: "Reaksi dengan Ethylene Glycol / MEG (290531)", desc: "Bahan dasar pembuatan kain tekstil, benang jahitan industri, dan serat pakaian sintetis tahan kusut." }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            id: "hs_290241", name: "Orto-Xilena / o-Xylene (290241)", type: "hilir", desc: "Isomer xilena struktur orto.",
+                                            children: [
+                                                { id: "hs_291735", name: "Phthalic Anhydride (291735)", type: "aplikasi", desc: "Bahan baku kunci pembuat pelentur plastik (plasticizer PVC) dan pencampur resin poliester (Fiberglass)." }
+                                            ]
+                                        },
+                                        { id: "hs_290230_44", name: "Toluena & Mixed Xylene (290230, 290244)", type: "aplikasi", desc: "Senyawa aromatik Toluena dan Xilena Campur yang umumnya dijual langsung untuk dimanfaatkan sebagai pelarut industri kelas berat pada cat, tinta, dan karet." }
+                                    ]
+                                },
+                                {
+                                    id: "hs_olefin_naphtha", name: "Jalur Olefin (Rantai Lurus)", type: "antara", process: "Steam Cracking", desc: "Perengkahan termal molekul Naphtha (serta tambahan gas propana/butana LPG) menjadi rantai gas olefin tak jenuh.",
+                                    children: [
+                                        {
+                                            id: "hs_290121", name: "Etena / Ethylene murni (290121)", type: "antara", desc: "Molekul gas etilena, blok bangunan penyusun dasar mayoritas industri plastik di dunia.",
+                                            children: [
+                                                {
+                                                    id: "hs_3901", name: "Polyethylene / PE Primer (3901)", type: "hilir", process: "Polimerisasi Etilena", desc: "Resin plastik paling banyak diproduksi berjenis Polyethylene.",
+                                                    children: [
+                                                        { id: "hs_390110", name: "LDPE / LLDPE (390110)", type: "aplikasi", desc: "Biji plastik fleksibel untuk ditiup menjadi kantong kresek tipis, film pembungkus bening, dan pelapis geomembran tahan bocor." },
+                                                        { id: "hs_390120", name: "HDPE Kepadatan Tinggi (390120)", type: "aplikasi", desc: "Plastik sangat kaku yang dicetak cetak-tiup untuk jerigen, drum bahan kimia industri, dan pipa penyalur air bertekanan di bawah tanah." }
+                                                    ]
+                                                },
+                                                {
+                                                    id: "hs_290321", name: "Vinyl Chloride / VCM (290321)", type: "hilir", requirements: "Reaksi dengan Gas Klorin (Cl2)", desc: "Monomer terhalogenasi cair sebagai prekursor tunggal plastik jenis PVC.",
+                                                    children: [
+                                                        { id: "hs_390410", name: "Resin Plastik PVC (390410)", type: "aplikasi", desc: "Bubuk resin PVC yang sangat kaku, dapat dicetak menjadi Pipa Paralon perumahan, insulasi selubung kabel listrik, hingga plafon gantung dan kusen tahan rayap." }
+                                                    ]
+                                                },
+                                                {
+                                                    id: "hs_291010", name: "Ethylene Oxide (291010)", type: "hilir", desc: "Senyawa gas epoksida turunan oksigen.",
+                                                    children: [
+                                                        { id: "hs_290531", name: "Ethylene Glycol / MEG (290531)", type: "aplikasi", desc: "Senyawa cair antibeku radiator yang juga bertindak selaku reaktan pengikat bubuk PTA di pabrik petrokimia untuk membentuk lelehan plastik PET." }
+                                                    ]
+                                                },
+                                                {
+                                                    id: "hs_290250", name: "Stirena murni / Styrene (290250)", type: "hilir", requirements: "Reaksi Etilena dengan Benzena (290220)", desc: "Monomer aromatik esensial dalam bentuk cairan berminyak.",
+                                                    children: [
+                                                        { id: "hs_390311", name: "Expansible Polystyrene / EPS (390311)", type: "aplikasi", desc: "Biji plastik yang bila dipanaskan dengan uap akan mengembang kaku menjadi busa putih (Styrofoam) peredam kejut pada kotak pendingin makanan atau alat elektronik baru." },
+                                                        { id: "hs_390319", name: "Solid Polystyrene / PS (390319)", type: "aplikasi", desc: "Plastik kaku yang dapat dibentuk jadi sangat bening, biasanya untuk wadah mika jernih dan alat makan sekali pakai." },
+                                                        { id: "hs_4002_sbr", name: "Karet Sintetis SBR (400211, 400219)", type: "aplikasi", requirements: "Campuran Stirena (290250) + Butadiena (290124)", desc: "Karet Styrene-Butadiene (berbentuk cair lateks / padat) pembuat kompon tangguh tahan aspal pada tapak luar ban mobil dan sol sepatu berat." }
+                                                    ]
+                                                },
+                                                { id: "hs_290110", name: "Saturated Hydrocarbons (290110)", type: "aplikasi", desc: "Senyawa tak jenuh sampingan (seperti heksana) yang dijual sebagai cairan pelarut ekstraksi." }
+                                            ]
+                                        },
+                                        {
+                                            id: "hs_290122", name: "Propena / Propylene murni (290122)", type: "antara", desc: "Gas olefin turunan kedua terbesar, bahan pembuat plastik yang memiliki titik lebur (meleleh) lebih tinggi daripada Polyethylene.",
+                                            children: [
+                                                { id: "hs_390210", name: "Polypropylene / Plastik PP (390210)", type: "aplikasi", desc: "Biji plastik tangguh yang dapat menahan panas sterilisasi, serta anti-sobek saat ditekuk berulang-ulang. Dicetak jadi dashboard mobil dalam, tutup botol flip, dan dipintal berserat jadi anyaman karung dan lapisan kain masker medis." },
+                                                {
+                                                    id: "hs_291020", name: "Propylene Oxide (291020)", type: "hilir", desc: "Bahan epoksida intermediet turunan propilena.",
+                                                    children: [
+                                                        { id: "hs_390950", name: "Resin Polyurethanes / PU (390950)", type: "aplikasi", desc: "Dicampur bersama bahan pengeras untuk membusa membentuk karet PU empuk kenyal pembentuk kasur tidur, pengisi jok mobil, dan bantalan sofa." }
+                                                    ]
+                                                },
+                                                { id: "hs_290512", name: "Isopropanol / Isopropyl alcohol (290512)", type: "aplikasi", desc: "Cairan murni alkohol gosok pembunuh kuman untuk cairan hand-sanitizer dan pelarut pembersih komponen di industri elektronika mikrocip." },
+                                                {
+                                                    id: "hs_292610", name: "Acrylonitrile (292610)", type: "hilir", requirements: "Reaksi dengan Amonia", desc: "Senyawa prekursor pembentuk turunan plastik keras/lentur.",
+                                                    children: [
+                                                        { id: "app_abs_nbr", name: "Plastik ABS & Serat Akrilik", type: "aplikasi", desc: "Komponen utama penyusun resin paduan plastik ABS yang ekstrem kerasnya (contoh: cangkang helm SNI dan bodi elektronik), serta bahan dasar pembuatan serat kain wol buatan (akrilik)." }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            id: "hs_290123", name: "Butilena / Butene (290123)", type: "antara", desc: "Isomer rantai C4 olefin.",
+                                            children: [
+                                                { id: "app_butene", name: "Modifikator Plastik Polimer Lanjutan", type: "aplikasi", desc: "Ditambahkan bersama Etilena untuk memodifikasi agar tingkat kelenturan plastik akhir Polyethylene (LLDPE) lebih maksimal tanpa putus (merenggang seperti karet gelang)." }
+                                            ]
+                                        },
+                                        {
+                                            id: "hs_290124", name: "Butadiena & Isoprena murni (290124)", type: "antara", desc: "Senyawa olefin cincin rangkap, prekursor utama bagi material industri karet dunia.",
+                                            children: [
+                                                {
+                                                    id: "hs_4002_br", 
+                                                    name: "Butadiene Rubber / BR Primer (400220)", 
+                                                    type: "aplikasi", 
+                                                    process: "Polimerisasi Katalis Titanium", 
+                                                    desc: "Bongkahan karet sintetis BR murni yang super kebal terhadap retak dingin maupun gesekan aspal jalanan secara langsung, digunakan khusus mencampur kompon terluar telapak ban otomotif cengkeraman tinggi."
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        };

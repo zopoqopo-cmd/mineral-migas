@@ -1,0 +1,1518 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Hilirisasi Mineral</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Tipografi McKinsey-style */
+        body { font-family: 'Inter', Helvetica, Arial, sans-serif; background-color: #ffffff; color: #333333; }
+        .font-serif-title { font-family: 'Playfair Display', serif; }
+        
+        /* Card datar (Flat Design) tanpa shadow */
+        .node-card {
+            transition: all 0.15s ease;
+            min-width: 200px;
+            max-width: 220px;
+            border-radius: 0; /* Square corners */
+        }
+        .node-card:hover { 
+            border-color: #008272; /* Teal hover */
+        }
+        
+        /* Node aktif menggunakan border highlight, bukan ring glow */
+        .node-active {
+            border: 2px solid #008272 !important;
+        }
+
+        /* Custom scrollbar minimalis */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: #ffffff; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-slate-300 sticky top-0 z-30">
+        <div class="max-w-[1400px] mx-auto px-6 py-5 flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl font-serif-title text-[#051c2c] leading-tight">Dashboard Hilirisasi Mineral</h1>
+                <p class="text-[11px] text-slate-500 font-semibold uppercase tracking-widest mt-1">Peta Rantai Pasok & Aplikasi Akhir</p>
+            </div>
+            <!-- Logo placeholder (discreet) -->
+            <div class="hidden md:block text-[10px] text-slate-400 font-bold uppercase tracking-widest border border-slate-200 px-2 py-1">
+                Internal / Confidential
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-[1400px] mx-auto px-6 py-6 w-full flex flex-col lg:flex-row gap-8 flex-grow">
+        
+        <!-- Left: Navigation & Tree -->
+        <div class="flex-grow flex flex-col gap-6 overflow-hidden">
+            
+            <!-- Tabs (Flat underline style) -->
+            <nav id="mineralTabs" class="flex flex-wrap border-b border-slate-200">
+                <!-- Tabs generated via JS -->
+            </nav>
+
+            <!-- Visualization Canvas -->
+            <div class="bg-white flex flex-col flex-grow overflow-hidden min-h-[600px] relative">
+                <div id="mineralHeader" class="py-4 border-b border-slate-200">
+                    <!-- Header info generated via JS -->
+                </div>
+
+                <!-- Legend McKinsey Style (Monochromatic & Teal) -->
+                <div class="py-3 flex flex-wrap gap-6 text-[10px] font-bold uppercase tracking-wider text-slate-600 border-b border-slate-100">
+                    <div class="flex items-center gap-2"><span class="w-3 h-3 bg-[#eafaf2] border border-[#b7e0c9]"></span> Hulu (Raw Material)</div>
+                    <div class="flex items-center gap-2"><span class="w-3 h-3 bg-[#eef2ff] border border-[#c7d2fe]"></span> Industri Antara</div>
+                    <div class="flex items-center gap-2"><span class="w-3 h-3 bg-[#eff6ff] border border-[#93c5fd]"></span> Produk Hilir</div>
+                    <div class="flex items-center gap-2"><span class="w-3 h-3 bg-[#ecfeff] border-2 border-[#67e8f9]"></span> Aplikasi Akhir (End-Use)</div>
+                </div>
+
+                <!-- Tree Wrapper -->
+                <div id="treeCanvas" class="py-10 px-6 overflow-auto flex-grow flex items-start justify-start relative">
+                    <div id="flowWrapper" class="relative inline-flex p-4 min-w-max min-h-max">
+                        <svg class="absolute top-0 left-0 w-full h-full pointer-events-none z-0">
+                            <defs>
+                                <marker id="arrowhead" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                                    <polygon points="0 0, 6 3, 0 6" fill="#94a3b8" />
+                                </marker>
+                            </defs>
+                            <g id="svgPaths"></g>
+                        </svg>
+                        <div id="treeContent" class="relative z-10 flex items-center"></div>
+                    </div>
+                </div>
+
+                <!-- The "Kicker" -->
+                <div class="absolute bottom-2 right-2 text-[9px] text-slate-400 font-medium">
+                    Unit: Klasifikasi HS & Value Chain Analysis, 2023
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Detail Panel (Call-out Box Style) -->
+        <aside class="w-full lg:w-[380px] flex-shrink-0">
+            <div class="bg-white sticky top-24 h-[calc(100vh-8rem)] flex flex-col border-l border-slate-200 pl-8">
+                <div class="pb-4 border-b border-slate-800 text-[#051c2c] font-bold text-sm tracking-wide uppercase flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                    Detail Informasi
+                </div>
+                <div id="detailPanel" class="py-6 overflow-auto flex-grow">
+                    <div class="h-full flex flex-col items-center justify-center text-center text-slate-400 space-y-4 py-12">
+                        <svg class="w-10 h-10 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                            <rect x="3" y="3" width="18" height="18" rx="0" ry="0"></rect>
+                            <line x1="3" y1="9" x2="21" y2="9"></line>
+                            <line x1="9" y1="21" x2="9" y2="9"></line>
+                        </svg>
+                        <p class="text-xs">Pilih salah satu kotak pada bagan untuk melihat detail.</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <script>
+        const industrialTrees = {
+            nikel: {
+                title: "Rantai Nilai Nikel",
+                desc: "Hilirisasi nikel dengan terminologi industri metalurgi (RKEF & HPAL Process).",
+                tree: {
+                    id: "ni_input", name: "Bahan Baku Nikel", type: "hulu", desc: "Input utama industri nikel dari tambang dan daur ulang.",
+                    children: [
+                        {
+                            id: "hs_2604", name: "Nickel Ore Laterite (2604)", type: "hulu", process: "Open-pit Mining", requirements: "Alat Berat, Bahan Peledak (Opsional), Dump Truck", desc: "Bijih nikel laterit terbagi dua tipe utama: Saprolit (kadar Ni tinggi) dan Limonit (kadar Ni rendah).",
+                            children: [
+                                {
+                                    id: "hs_7501", name: "Nickel Matte & NPI (7501)", type: "antara", process: "Pyrometallurgy (Smelting)", requirements: "Batubara Metalurgi/Kokas (Reduktor), Batu Kapur (CaCO3) sebagai Flux, Listrik Arus Kuat", desc: "Produk antara metalurgi nikel dari jalur pirometalurgi.",
+                                    children: [
+                                        {
+                                            id: "hs_750110", name: "Nickel Matte (750110)", type: "antara", process: "Sulfiding Smelting", requirements: "Belerang (S) / Pyrite (FeS2), Udara Oksidasi", desc: "Produk antara dengan kadar nikel 75-78% dan sulfur tinggi, bahan dasar untuk kilang nikel murni.",
+                                            children: [
+                                                {
+                                                    id: "hs_7502", name: "Refined Nickel / Katoda (7502)", type: "antara", process: "Electrowinning / Carbonyl Process", requirements: "Asam Sulfat (H2SO4), Asam Borat (H3BO3), Katalis khusus, Listrik DC", desc: "Logam nikel murni (Class 1 Nickel) berupa katoda, briket, atau pellet.",
+                                                    children: [
+                                                        {
+                                                            id: "hs_750210", name: "Nickel Class 1 (750210)", type: "antara", process: "Refining", desc: "Nikel murni tak paduan berstandar LME (kadar Ni > 99.8%).",
+                                                            children: [
+                                                                { id: "hs_7504", name: "Nickel Powder & Flakes (7504)", type: "hilir", process: "Atomization / Hydrometallurgical reduction", requirements: "Gas Hidrogen (H2) bertekanan", desc: "Bahan pelapis kimia & pembentuk komponen metalurgi serbuk.", children: [{id: "app_batt_ni", name: "Baterai Ni-Cd/Ni-MH (8507)", type: "aplikasi", desc: "Serbuk nikel dicetak dan disinter menjadi matriks penyangga elektroda positif (katoda) di dalam sel baterai industri, perkakas listrik, dan kendaraan hybrid."}] },
+                                                                { id: "hs_7505_pure", name: "Nickel Wire & Rod (7505.11/21)", type: "hilir", process: "Extrusion & Wire Drawing", requirements: "Pelumas Drawing (Isopropanol/Oli khusus)", desc: "Konduktor presisi tinggi non-paduan.", children: [{id: "app_7505_pure", name: "Sensor & Konduktor Listrik", type: "aplikasi", desc: "Kawat nikel murni ditenun atau digulung menjadi komponen inti sensor presisi, terminal penghubung, dan konduktor elektronik yang menuntut ketahanan karat absolut."}] },
+                                                                { id: "hs_7506_pure", name: "Nickel Foil & Sheet (7506.10)", type: "hilir", process: "Cold Rolling", requirements: "Cairan Pendingin Emulsi", desc: "Lembaran tipis nikel murni.", children: [{id: "app_7506_pure", name: "Komponen Baterai & Kapasitor", type: "aplikasi", desc: "Lembaran nikel (foil) diaplikasikan sebagai pengumpul arus (current collector) penghubung antar sel baterai dan komponen tabung elektroda pada peralatan lab."}] },
+                                                                { id: "hs_7507_pure", name: "Nickel Tubing (7507.11)", type: "hilir", process: "Pilgering / Tube Extrusion", desc: "Pipa seamless murni tahan bahan kimia.", children: [{id: "app_7507_pure", name: "Peralatan Makanan & Farmasi", type: "aplikasi", desc: "Pipa nikel murni dirakit dan dilas menjadi sistem perpipaan higienis (food-grade) pabrik makanan/obat untuk mencegah kontaminasi silang dan korosi zat asam."}] }
+                                                            ]
+                                                        },
+                                                        {
+                                                            id: "hs_750220", name: "Nickel Superalloys (750220)", type: "antara", process: "Vacuum Induction Melting (VIM)", requirements: "Gas Argon (Ar), Logam Paduan (Kromium, Molybdenum, Besi)", desc: "Paduan nikel berperforma tinggi yang sangat tahan suhu ekstrem dan korosi.",
+                                                            children: [
+                                                                { id: "hs_7505_alloy", name: "Alloy Bar & Wire (7505.12/22)", type: "hilir", process: "Hot Rolling & Drawing", desc: "Produk panjang paduan nikel (contoh: Inconel, Monel).", children: [{id: "app_7505_alloy", name: "Elemen Pemanas & Termokopel", type: "aplikasi", desc: "Kawat paduan nikel (seperti Nichrome) digulung menjadi koil pemanas (heating element) pada tungku industri, serta menjadi probe pengukur pada kabel termokopel."}] },
+                                                                { id: "hs_7506_alloy", name: "Alloy Sheet & Cladding (7506.20)", type: "hilir", process: "Rolling & Cladding", desc: "Lembaran tahan korosi untuk tangki berat.", children: [{id: "app_7506_alloy", name: "Heat Exchanger & Reaktor Kimia", type: "aplikasi", desc: "Lembaran superalloy dipotong dan disusun menjadi bilah penukar panas (heat exchanger) dan lapisan dinding pelindung (cladding) di dalam reaktor kimia agresif."}] },
+                                                                { id: "hs_7507_alloy", name: "Alloy Pipe & Fittings (7507.12/20)", type: "hilir", process: "Forging & Machining", desc: "Termasuk flange, elbow, tee berbahan superalloy.", children: [{id: "app_7507_alloy", name: "Pipa Migas & Reaktor Nuklir", type: "aplikasi", desc: "Pipa dan fitting superalloy dirakit dengan baut/las menjadi jalur pipa bawah laut (sub-sea) rig minyak dan sistem pendingin primer pada reaktor nuklir yang anti-radiasi."}] },
+                                                                { id: "hs_7508", name: "Wire Mesh & Netting (7508)", type: "hilir", process: "Weaving", desc: "Kain kawat dan anyaman presisi paduan nikel.", children: [{id: "app_7508", name: "Filter Kimia Industri", type: "aplikasi", desc: "Anyaman kawat nikel dipasang pada bingkai baja sebagai membran penyaring utama (filter screen) pemisah partikel dari cairan korosif bersuhu tinggi."}] }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    id: "hs_283324", name: "Nickel Sulphate (283324)", type: "antara", process: "Solvent Extraction & Crystallization", requirements: "Asam Sulfat (H2SO4), NaOH (Pengatur pH), Extractant (ex: Cyanex 272)", desc: "Senyawa nikel sulfat hexahydrate (kristal hijau) untuk prekursor (PCAM).",
+                                                    children: [
+                                                        { id: "app_850760", name: "Li-ion Battery (NMC/NCA) (850760)", type: "aplikasi", desc: "Kristal nikel sulfat direaksikan menjadi PCAM, kemudian dipanggang bersama litium untuk membentuk serbuk katoda penyimpan daya utama pada sel baterai mobil listrik (EV)." }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            id: "hs_720260", name: "Ferronickel / NPI (720260)", type: "antara", process: "Rotary Kiln Electric Furnace (RKEF)", requirements: "Batubara Metalurgi, Batu Kapur (Dolomit)", desc: "Paduan nikel-besi mentah yang langsung disuplai ke pabrik baja.",
+                                            children: [
+                                                { id: "app_stainless", name: "Stainless Steel (Seri 300)", type: "aplikasi", desc: "Ferronickel/NPI dilebur langsung bersama kromium untuk mengunci struktur matriks kristal besi menjadi baja Austenitik yang mengkilap, tahan karat, dan diaplikasikan pada wastafel hingga pisau bedah." }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    id: "hs_750120", name: "Oxide Sinters (750120)", type: "antara", process: "Fluidized Bed Roasting", requirements: "Oksigen udara panas", desc: "Sinter oksida nikel dari tahap roasting bijih sulfida.",
+                                    children: [
+                                        { id: "hs_282540", name: "Oksida Nikel (282540)", type: "antara", desc: "Senyawa kimia oksida nikel.", children: [{id: "app_keramik", name: "Katalis, Kaca & Keramik", type: "aplikasi", desc: "Oksida nikel dicampurkan sebagai bahan pemberi pigmen warna (frit) pada industri kaca/keramik, atau diresapkan ke dalam pori substrat sebagai agen katalisator penyulingan migas."}] }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            id: "hs_7503", name: "Nickel Scrap & Waste (7503)", type: "hulu", process: "Pengepulan & Sortasi", desc: "Sisa industri fabrikasi dan baterai bekas untuk ekonomi sirkular.",
+                            children: [
+                                { id: "app_recycle_ni", name: "Secondary Nickel", type: "antara", process: "Hydrometallurgical Recycling (Black Mass)", requirements: "Asam Kuat, Reagen Solvent Extraction", desc: "Diurai dan dimurnikan kembali menjadi mineral garam nikel seperti Nikel Sulfat." }
+                            ]
+                        }
+                    ]
+                }
+            },
+            timah: {
+                title: "Rantai Nilai Timah",
+                desc: "Hilirisasi timah dengan spesifikasi produk akhir dan proses metalurgi Timah.",
+                tree: {
+                    id: "hs_2609", name: "Cassiterite Concentrate (2609)", type: "hulu", process: "Washing & Gravity Beneficiation", requirements: "Air Jumlah Besar, Flokulan (Opsional), Jig Separator", desc: "Bijih timah (kasiterit - SnO2) yang telah ditingkatkan kadarnya.",
+                    children: [
+                        {
+                            id: "hs_8001", name: "Tin Ingot / Timah Mentah (8001)", type: "antara", process: "Reverberatory Furnace Smelting", requirements: "Batu Bara/Antrasit (Reduktor), Batu Kapur (CaCO3) sebagai Flux", desc: "Logam timah batangan (Ingot) dengan kemurnian tinggi hasil peleburan.",
+                            children: [
+                                {
+                                    id: "hs_800110", name: "Refined Tin (800110)", type: "antara", process: "Crystallization / Electrorefining", desc: "Timah murni tidak dipadu, standar LME 99.85% Sn.",
+                                    children: [
+                                        {
+                                            id: "hs_7210_7212", name: "Tinplate (ETP) (7210/7212)", type: "hilir", process: "Electrolytic Tinning", requirements: "Baja Canai Dingin (CRC), Asam Sulfat / Metanesulfonat, Phenol Sulfonic Acid", desc: "Lembaran baja tipis yang disalut lapisan timah pelindung karat secara elektrolisa.",
+                                            children: [
+                                                { id: "app_721012", name: "Kemasan Makanan & Minuman", type: "aplikasi", desc: "Baja berlapis timah dipotong, di-roll menjadi silinder, dan disatukan (seaming) untuk membentuk badan kaleng (tin can) hampa udara guna melindungi makanan dari pembusukan dan toksisitas." },
+                                                { id: "app_721011", name: "Komponen Industri & Aerosol", type: "aplikasi", desc: "Pelat Tinplate dicetak press (deep drawing) menjadi tutup botol kaca (crown cork), komponen tangki BBM, serta tabung kuat penahan tekanan gas (seperti kaleng cat semprot aerosol)." }
+                                            ]
+                                        },
+                                        {
+                                            id: "hs_8005", name: "Tin Foil & Powder (8005)", type: "hilir", process: "Atomization & Fine Rolling", requirements: "Gas Inert (Nitrogen/Argon)", desc: "Timah dalam bentuk serbuk sangat halus atau lembaran menyerupai kertas.",
+                                            children: [{ id: "app_8005", name: "Pigmen Cat & Kapasitor Elektronik", type: "aplikasi", desc: "Timah foil tipis digulung bersama kertas/plastik insulasi menjadi pelat dielektrik pada tabung kapasitor listrik, sedangkan bentuk bubuknya dilarutkan menjadi senyawa penolak karat (anti-fouling) di cat lambung kapal." }]
+                                        }
+                                    ]
+                                },
+                                {
+                                    id: "hs_800120", name: "Tin Alloys (800120)", type: "antara", process: "Alloying Melting", requirements: "Logam Paduan (Timbal/Pb, Tembaga/Cu, Perak/Ag, Antimon/Sb)", desc: "Timah yang dipadu dengan logam lain untuk merekayasa titik leleh atau kekerasan.",
+                                    children: [
+                                        {
+                                            id: "hs_8003", name: "Tin Solder Alloy (8003)", type: "hilir", process: "Extrusion & Wire Drawing", requirements: "Flux (Rosin / Damar Kental)", desc: "Kawat solder (sering dicampur timbal atau bebas timbal / lead-free solder).",
+                                            children: [{ id: "app_8003", name: "Perakitan PCB (Printed Circuit Board)", type: "aplikasi", desc: "Kawat solder dilelehkan melalui mesin gelombang (wave soldering) atau mata solder untuk menciptakan ikatan konduktif dan jangkar mekanis yang menempelkan kaki-kaki cip semikonduktor di atas papan PCB." }]
+                                        },
+                                        {
+                                            id: "hs_8007", name: "Pewter Alloy (8007)", type: "hilir", process: "Casting & Machining", requirements: "Antimon (Sb), Tembaga (Cu)", desc: "Paduan timah yang lentur namun kuat untuk dikerjakan secara mekanis.",
+                                            children: [{ id: "app_8007", name: "Cenderamata & Kerajinan Logam", type: "aplikasi", desc: "Blok paduan Pewter dicairkan lalu dituang ke dalam cetakan cetakan silikon/logam, mengeras, lalu diukir dan dipoles menjadi barang jadi seperti piala, teko klasik, dan piring hias." }]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+            tembaga: {
+                title: "Rantai Nilai Tembaga",
+                desc: "Hilirisasi tembaga komprehensif berdasarkan klasifikasi presisi Kode HS 26, 74, dan 85.",
+                tree: {
+                    id: "cu_input", name: "Bahan Baku Tembaga", type: "hulu", desc: "Sumber utama material tembaga dari tambang murni, abu, dan daur ulang (scrap).",
+                    children: [
+                        {
+                            id: "hs_2603", name: "Copper Concentrate (2603)", type: "hulu", process: "Comminution & Froth Flotation", requirements: "Kolektor (ex: Xanthate), Frother (MIBC), Kapur/pH Modifier", desc: "Konsentrat mineral Chalcopyrite dengan kadar tembaga ditingkatkan menjadi ~25-30%.",
+                            children: [
+                                {
+                                    id: "hs_7401", name: "Copper Mattes (7401)", type: "antara", process: "Flash Smelting", requirements: "Fluks Silika (SiO2), Oksigen Murni", desc: "Cairan tembaga sulfida (matte) dengan kemurnian 50-70% hasil peleburan konsentrat tahap pertama.",
+                                    children: [
+                                        {
+                                            id: "hs_7402", name: "Anodes / Unrefined (7402)", type: "antara", process: "Converting & Fire Refining", requirements: "Reduktor Gas Alam / Minyak Residu", desc: "Tembaga lepuh (Blister, 98-99% Cu) yang dicetak menjadi lempengan anoda raksasa.",
+                                            children: [
+                                                {
+                                                    id: "hs_740311", name: "Refined Cathodes (7403.11)", type: "antara", process: "Electrorefining", requirements: "Asam Sulfat (H2SO4), Arus Listrik DC Besar, Katalis (Thiourea / Lem Tulang)", desc: "Plat katoda tembaga dengan tingkat kemurnian ekstrem Grade A (99.99%).",
+                                                    children: [
+                                                        {
+                                                            id: "hs_740312", name: "Copper Wire-bars (7403.12)", type: "antara", process: "Continuous Casting and Rolling (CCR)", requirements: "Isopropanol (Pelumas Pendingin Oksidasi)", desc: "Katoda dilebur dan dicetak memanjang kontinu menjadi batangan kawat dasar.",
+                                                            children: [
+                                                                {
+                                                                    id: "hs_7408", name: "Copper Wire (7408)", type: "hilir", process: "Wire Drawing", desc: "Kawat tembaga penampang padat hasil penarikan (drawing) dari tebal hingga super halus.",
+                                                                    children: [
+                                                                        { id: "hs_854411", name: "Winding Wire (8544.11)", type: "aplikasi", desc: "Kawat tembaga murni dilapisi enamel tipis lalu dililit rapat menjadi kumparan (stator/rotor) pendaya elektromagnetik pada dinamo motor listrik (EV), transformator tegangan, dan generator." },
+                                                                        { id: "hs_7413", name: "Stranded Cables (7413)", type: "aplikasi", desc: "Beberapa utas kawat tembaga dipilin (stranded) menjadi inti tebal dan fleksibel untuk kabel jaringan transmisi daya ekstra tinggi (SUTET) tanpa insulasi serta grounding sistem penangkal petir." }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            id: "hs_740313", name: "Copper Billets (7403.13)", type: "antara", process: "Billet Casting", desc: "Blok silinder tembaga murni yang siap diekstrusi atau ditekan paksa menjadi bentuk panjang berongga.",
+                                                            children: [
+                                                                {
+                                                                    id: "hs_7411", name: "Tubes & Pipes (7411)", type: "hilir", process: "Billet Piercing & Tube Extrusion", desc: "Pipa dan tabung tembaga mulus (seamless) yang tahan karat dan kuat menahan tekanan tinggi.",
+                                                                    children: [
+                                                                        { id: "hs_7412", name: "HVAC & Pipe Fittings (7412)", type: "aplikasi", desc: "Tabung dan pipa tembaga dipotong, ditekuk (bending), dan dilengkapi sambungan (fitting) tempa untuk membentuk jalur sirkulasi kondensor cairan penyejuk (freon) pada sistem pendingin udara (AC/Kulkas) serta distribusi gas medis." }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    id: "hs_7407", name: "Bars & Profiles (7407)", type: "hilir", process: "Hot Extrusion", desc: "Batangan dan profil struktural padat tanpa rongga berbahan tembaga murni.",
+                                                                    children: [
+                                                                        { id: "app_busbar", name: "Busbar Panel Listrik", type: "aplikasi", desc: "Batang tembaga (bars/rods) dipotong, dilubangi, dan dibaut ke dalam panel distribusi gardu induk bertindak sebagai konduktor busbar, mengalirkan arus tegangan tinggi dengan tahanan panas sangat rendah." }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            id: "hs_7409", name: "Plates, Sheets, Strip (7409)", type: "hilir", process: "Hot/Cold Rolling", desc: "Lembaran dan pelat tembaga dengan ketebalan di atas 0.15 mm hasil pengerolan ingot.",
+                                                            children: [
+                                                                {
+                                                                    id: "hs_7410", name: "Copper Foil (7410)", type: "hilir", process: "Precision Cold Rolling / Electrodeposition", desc: "Foil tembaga ultra-tipis dengan ketebalan di bawah 0.15 mm, seringkali dilaminasi bahan pelindung.",
+                                                                    children: [
+                                                                        { id: "app_pcb", name: "Printed Circuit Board (PCB) & Baterai", type: "aplikasi", desc: "Foil tembaga dilaminasi ke substrat isolator dan dietsa (etching) membentuk jalur kelistrikan mini pada papan sirkuit (PCB) laptop/HP, serta digulung berlapis sebagai pengumpul arus (current collector) di sisi anoda sel baterai Li-ion." }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            id: "hs_74032x", name: "Copper Alloys (7403.2x)", type: "antara", process: "Alloying & Melting", requirements: "Logam Aditif: Zinc/Seng, Tin/Timah, Nikel", desc: "Paduan tembaga dalam bentuk un-wrought ingot (Kuningan/Brass, Perunggu/Bronze, Cupro-nickel).",
+                                                            children: [
+                                                                {
+                                                                    id: "hs_alloy_parts", name: "Alloy Profiles, Plates, Tubes", type: "hilir", process: "Extrusion, Casting, Machining", desc: "Barang setengah jadi dari paduan tembaga yang mengutamakan kelenturan akustik, warna, atau ketahanan gesek.",
+                                                                    children: [
+                                                                        { id: "app_alloy", name: "Komponen Maritim & Instrumen", type: "aplikasi", desc: "Bahan paduan (seperti Kuningan & Cu-Ni) dibubut (machining) dan dibentuk menjadi instrumen musik tiup beresonansi tinggi, dicetak menjadi baling-baling kapal yang anti-teritip air laut, dan dipotong menjadi selongsong peluru amunisi." }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            id: "hs_7404", name: "Waste & Scrap (7404)", type: "hulu", process: "Pengepulan & Sortasi Mekanis", desc: "Kabel bekas, pipa rongsokan, dan sisa produksi pabrik (scrap) untuk mendaur ulang suplai material.",
+                            children: [
+                                {
+                                    id: "hs_7406", name: "Powders & Flakes (7406)", type: "hilir", process: "Gas/Water Atomization", desc: "Serbuk dan partikel bubuk tembaga murni hasil penyemprotan tembaga daur ulang/mentah yang dicairkan.",
+                                    children: [
+                                        { id: "app_powder", name: "Sintered Parts & Tinta Metalik", type: "aplikasi", desc: "Serbuk tembaga ditekan kuat ke dalam cetakan dan dipanggang (sintering) membentuk komponen logam rumit bersuhu tinggi (roda gigi kecil/bearing otomotif), atau dilarutkan ke dalam larutan polimer menjadi cat anti-fouling dan tinta elektromagnetik konduktif." }
+                                    ]
+                                },
+                                {
+                                    id: "hs_chem", name: "Copper Chemicals (2825/33)", type: "antara", process: "Chemical Dissolution & Leaching", requirements: "Asam Sulfat (H2SO4), Asam Klorida (HCl)", desc: "Senyawa mineral klorida, hidroksida, oksida, dan sulfat tembaga yang diekstrak secara kimiawi dari sisa abu (2620.30) atau scrap.",
+                                    children: [
+                                        { id: "app_agro", name: "Agrokimia & Pigmen Pewarna", type: "aplikasi", desc: "Senyawa tembaga sulfat dilarutkan menjadi larutan semprot fungisida (Bordeaux mixture) untuk mencegah hama jamur di perkebunan, disintesis menjadi cairan pengawet kayu konstruksi (anti-rayap), serta dicetak menjadi serbuk pigmen biru-kehijauan untuk pelapis industri keramik." }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+            bauksit: {
+                title: "Rantai Nilai Bauksit (Aluminium)",
+                desc: "Hilirisasi bauksit komprehensif berdasarkan klasifikasi Kode HS 26, 28, dan 76 hingga ke tingkat aplikasi produk manufaktur.",
+                tree: {
+                    id: "al_input", name: "Bahan Baku Aluminium", type: "hulu", desc: "Sumber utama material aluminium dari tambang laterit bauksit dan daur ulang (scrap).",
+                    children: [
+                        {
+                            id: "hs_2606", name: "Bauksit / Bauxite (2606)", type: "hulu", process: "Open-pit Mining & Washing", requirements: "Alat Berat, Air (Pencucian), Screen Separator", desc: "Tanah laterit yang kaya akan mineral aluminium oksida alami.",
+                            children: [
+                                {
+                                    id: "hs_281820", name: "Alumina / Aluminium Oksida (281820)", type: "antara", process: "Bayer Process", requirements: "Caustic Soda (NaOH), Kapur Tohor (CaO), Flocculant Polyacrylamide", desc: "Aluminium Oksida (Al2O3) berupa bubuk putih hasil pemurnian dari bijih bauksit.",
+                                    children: [
+                                        {
+                                            id: "hs_7601", name: "Unwrought Aluminium Ingot (7601)", type: "antara", process: "Hall-Héroult Electrolysis", requirements: "Cryolite (Na3AlF6), Aluminium Fluorida (AlF3), Anoda Karbon, Listrik Arus Kuat", desc: "Logam aluminium mentah cair yang dicetak dalam batangan (ingot) atau billet.",
+                                            children: [
+                                                {
+                                                    id: "hs_760110", name: "Aluminium Murni (760110)", type: "antara", process: "Casting", desc: "Ingot aluminium tanpa paduan tambahan.",
+                                                    children: [
+                                                        {
+                                                            id: "hs_7606_pure", name: "Pelat & Lembaran Murni (7606.11/91)", type: "hilir", process: "Hot & Cold Rolling", requirements: "Minyak Pelumas Pengerolan", desc: "Pelat/lembaran/strip aluminium murni datar atau gulungan (coil).",
+                                                            children: [
+                                                                {
+                                                                    id: "hs_7607", name: "Foil Aluminium (7607)", type: "hilir", process: "Precision Cold Rolling", desc: "Lembaran dengan ketebalan ≤ 0.2mm, bisa berupa plain (tanpa penguat) atau backed.",
+                                                                    children: [
+                                                                        { id: "app_7607", name: "Kemasan Farmasi & Makanan (7607.20)", type: "aplikasi", desc: "Foil aluminium dipres sangat tipis dan dilaminasi (ditempel) dengan plastik/kertas penyangga untuk membentuk bungkus obat (blister pack) atau kotak karton cair UHT, di mana lapisan aluminiumnya memblokir total cahaya, oksigen, dan bakteri pembusuk." }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            id: "hs_7605_pure", name: "Kawat Al Murni (7605.11/19)", type: "hilir", process: "Wire Drawing", desc: "Kawat dari aluminium murni.",
+                                                            children: [
+                                                                { id: "hs_7614", name: "Kabel Transmisi ACSR (7614)", type: "aplikasi", desc: "Kawat ditarik halus dan dipilin (stranded) mengelilingi inti kawat baja (ACSR - Aluminium Conductor Steel Reinforced) menjadi kabel listrik raksasa untuk jalur transmisi SUTET tegangan tinggi jarak jauh, memanfaatkan sifat aluminium yang sangat ringan dan konduktif." }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    id: "hs_760120", name: "Paduan Aluminium (760120)", type: "antara", process: "Alloying", requirements: "Magnesium (Mg), Silikon (Si), Tembaga (Cu), Seng (Zn)", desc: "Ingot aluminium yang dicampur logam lain untuk kekuatan dan ketahanan ekstra.",
+                                                    children: [
+                                                        {
+                                                            id: "hs_7604", name: "Batang & Profil Ekstrusi (7604)", type: "hilir", process: "Extrusion Pressing", desc: "Profil padat maupun berongga berbahan paduan aluminium.",
+                                                            children: [
+                                                                { id: "hs_7610", name: "Struktur Konstruksi & Kusen (7610)", type: "aplikasi", desc: "Billet aluminium dipanaskan dan ditekan (ekstrusi) melewati cetakan (die) menjadi profil berongga (hollow) memanjang. Profil ini kemudian dipotong dan dirakit menjadi kusen jendela, pintu arsitektural, hingga rangka jembatan dan atap ringan anti-karat." }
+                                                            ]
+                                                        },
+                                                        {
+                                                            id: "hs_7606_alloy", name: "Pelat & Lembaran Paduan (7606.12/92)", type: "hilir", process: "Rolling", desc: "Lembaran berkekuatan tinggi.",
+                                                            children: [
+                                                                { id: "hs_7612", name: "Wadah & Kaleng (7612)", type: "aplikasi", desc: "Lembaran paduan ditarik dalam (deep drawing process) dan dibentuk menjadi tabung silinder utuh, lalu ditutup (seaming), menjadi kaleng minuman (beverage can), wadah aerosol, atau kotak makanan kaku yang kedap udara." },
+                                                                { id: "hs_7615", name: "Peralatan Rumah Tangga (7615)", type: "aplikasi", desc: "Pelat aluminium ditekan paksa (press/stamping) pada cetakan baja (mold) untuk membentuk cekungan menjadi panci, wajan, dan wastafel dapur yang memiliki distribusi panas merata dan anti-lengket (setelah di-coating)." }
+                                                            ]
+                                                        },
+                                                        {
+                                                            id: "hs_7608", name: "Pipa & Tabung Paduan (7608/7609)", type: "hilir", process: "Billet Piercing", desc: "Pipa tahan tekanan berserta fitting-nya.",
+                                                            children: [
+                                                                { id: "hs_7613", name: "Tabung Gas Aluminium (7613)", type: "aplikasi", desc: "Pipa tebal dan ingot aluminium diekstrusi terbalik (backward extrusion) menjadi silinder tanpa kampuh las (seamless) yang sanggup menahan tekanan udara ekstrem di dalam tabung oksigen selam (scuba) dan tabung pemadam api portabel." }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    id: "hs_7603", name: "Bubuk & Serpihan (7603)", type: "hilir", process: "Atomization / Milling", desc: "Bubuk non-lamellar atau serpihan (lamellar) aluminium.",
+                                                    children: [
+                                                        { id: "app_321290", name: "Pigmen Cat & Bahan Peledak (321290)", type: "aplikasi", desc: "Serpihan tipis aluminium disebarkan ke dalam cairan pelarut (solvent/resin) sebagai agen pemantul cahaya, memberikan efek kilap (metalik) yang merata pada cat bodi otomotif. Dalam bentuk kering, bubuk ini dicampur ke oksidan menjadi bahan aktif propelan pendorong/kembang api." }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            id: "hs_281830", name: "Aluminium Hidroksida (281830)", type: "antara", process: "Precipitation", desc: "Produk turunan awal alumina sebelum dikalsinasi.",
+                                            children: [
+                                                { id: "hs_283322", name: "Aluminium Sulfat (283322)", type: "aplikasi", desc: "Aluminium hidroksida direaksikan dengan asam sulfat encer menjadi padatan kristal Tawas/Alum. Senyawa ini dilarutkan ke air baku PDAM dan limbah kertas bertindak sebagai agen koagulan yang mengikat kotoran (flok) sehingga lumpur mengendap dan air menjadi jernih." }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            id: "hs_7602", name: "Scrap & Sisa Aluminium (7602)", type: "hulu", process: "Pengepulan & Sortasi Mekanis", desc: "Produk bekas pakai (kaleng, velg) dan sisa potongan pabrik manufaktur.",
+                            children: [
+                                { id: "app_recycle_al", name: "Aluminium Sekunder", type: "antara", process: "Remelting (Peleburan Ulang)", requirements: "Tungku Reverb (Reverberatory Furnace), Gas Alam", desc: "Potongan scrap dilebur ulang menjadi ingot sekunder. Proses daur ulang ini menghemat hingga 95% energi listrik dibandingkan jika harus memproses dari tanah bauksit awal." }
+                            ]
+                        }
+                    ]
+                }
+            },
+            besi: {
+                title: "Rantai Nilai Besi & Baja",
+                desc: "Rantai pasok industri besi baja sebagai material tulang punggung infrastruktur.",
+                tree: {
+                    id: "fe_1", name: "Iron Ore Pellet / Sinter", type: "hulu", process: "Beneficiation & Pelletizing", requirements: "Bentonite (sebagai Binder/Perekat), Batu Kapur / Dolomit", desc: "Bijih besi yang dipadatkan bulat/sinter agar permeabel saat masuk tungku.",
+                    children: [{
+                        id: "fe_2", name: "Crude Steel (Billet/Slab/Bloom)", type: "antara", process: "Blast Furnace (BF) + Basic Oxygen Furnace (BOF) atau EAF", requirements: "Kokas / Batubara Metalurgi, Oksigen Murni, Kapur Dolomit, Elektroda Grafit (jika EAF)", desc: "Baja mentah setengah jadi yang siap di-roll panas.",
+                        children: [{
+                            id: "fe_3", name: "Rebar (Baja Tulangan) & Wire Rod", type: "hilir", process: "Hot Rolling Mill", desc: "Besi profil berulir (deformed bar) dan kawat gulungan untuk struktur tarik.",
+                            children: [{ id: "fe_4", name: "Konstruksi Infrastruktur Sipil", type: "aplikasi", desc: "Baja tulangan (rebar) dipotong ke panjang tertentu dan dirangkai menyilang menggunakan ikatan kawat bendrat membentuk kerangka penulangan beton (bekisting dalam). Kerangka baja ini kemudian dikubur utuh dengan cor beton semen basah dan mengeras, berfungsi memikul semua beban tarik dan gaya geser (yang tak bisa ditahan oleh beton murni) pada fondasi jalan, gelagar jembatan beton, dan kolom pilar gedung pencakar langit." }]
+                        }]
+                    }]
+                }
+            },
+            silika: {
+                title: "Rantai Nilai Pasir Silika & Kuarsa",
+                desc: "Hilirisasi pasir silika dan batuan kuarsa, bermula dari industri kaca dasar hingga menyuplai komponen teknologi semikonduktor canggih (Kode HS 25, 28, 38, 69, 70, 72, 85, 90).",
+                tree: {
+                    id: "si_input", name: "Bahan Baku Silika", type: "hulu", desc: "Sumber daya alam berbasis silikon dioksida (SiO2) dari alam.",
+                    children: [
+                        {
+                            id: "hs_250510", name: "Pasir Silika & Kuarsa Alam (2505.10/90)", type: "hulu", process: "Pencucian & Pemisahan Magnetik", requirements: "Air Jumlah Besar, Flotasi Asam (opsional untuk membuang unsur besi)", desc: "Butiran pasir kuarsa dengan kadar SiO2 sangat tinggi yang telah dibersihkan dari pengotor besi agar tidak merusak warna pada produk akhir.",
+                            children: [
+                                {
+                                    id: "hs_7001", name: "Massa Kaca & Pecahan (7001.00)", type: "antara", process: "Furnace Melting (Peleburan Kaca)", requirements: "Soda Ash (Penurun Titik Leleh), Limestone/Batu Kapur (Penstabil), Gas Alam", desc: "Campuran pasir silika yang telah dilebur menjadi cairan kaca atau didinginkan menjadi bongkahan massa kaca (termasuk pecahan cullet yang didaur ulang).",
+                                    children: [
+                                        {
+                                            id: "hs_7005", name: "Kaca Lembaran / Float Glass (7005)", type: "hilir", process: "Float Glass Process", requirements: "Kolam Timah Cair (Tin Bath), Gas Nitrogen/Hidrogen", desc: "Kaca cair dialirkan mengapung di atas lelehan timah rata sehingga menghasilkan lembaran kaca dasar yang sangat datar tanpa gelombang.",
+                                            children: [
+                                                { id: "app_7005", name: "Kaca Arsitektur & Pelindung Panel Surya", type: "aplikasi", desc: "Lembaran kaca (float glass) dipotong, di-tempering agar kuat menahan benturan, lalu dilapisi bahan anti-reflektif sebelum dipasang sebagai kaca fasad gedung pencakar langit atau sebagai kaca pelindung utama pada permukaan modul sel surya (PV)." }
+                                            ]
+                                        },
+                                        {
+                                            id: "hs_701090", name: "Botol & Wadah Kaca (7010.90)", type: "hilir", process: "Blow Molding / Press and Blow", desc: "Kaca cair (gob) dijatuhkan ke dalam cetakan cetakan besi, lalu ditiup paksa menggunakan tekanan udara hingga membentuk rongga.",
+                                            children: [
+                                                { id: "app_701090", name: "Kemasan Makanan & Farmasi", type: "aplikasi", desc: "Botol dan toples kaca disterilisasi dan digunakan langsung di jalur pengemasan pabrik sebagai wadah kedap udara yang 100% inert (tidak bereaksi secara kimiawi) untuk mengawetkan minuman, makanan, hingga ampul cairan vaksin farmasi." }
+                                            ]
+                                        },
+                                        {
+                                            id: "hs_7019", name: "Serat Kaca / Fiberglass (7019)", type: "hilir", process: "Fiber Spinning / Drawing", requirements: "Platinum Bushing (Cetakan Tahan Panas Ekstrem)", desc: "Kaca cair ditarik cepat melalui lubang mikroskopis menjadi helaian serat tipis yang sangat kuat terhadap tarikan.",
+                                            children: [
+                                                { id: "app_701911", name: "Insulator Bangunan & Material Komposit", type: "aplikasi", desc: "Helaian serat kaca dipintal secara acak membentuk lembaran wool kaca (glass wool) penyerap suara dan penahan panas pada dinding ruang gema. Selain itu, untaiannya juga dianyam lalu dicor bersama resin epoxy untuk mencetak bodi perahu dan lambung komposit yang super ringan namun kebal terhadap korosi laut." }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    id: "hs_281122", name: "Silikon Dioksida Murni (2811.22)", type: "antara", process: "Chemical Purification & Synthesis", requirements: "Bahan Kimia Asam/Basa Kuat", desc: "Serbuk SiO2 ultra murni kelas kimia yang diekstrak secara spesifik.",
+                                    children: [
+                                        {
+                                            id: "hs_381800", name: "Wafer Silikon Berdoping (3818.00)", type: "hilir", process: "Czochralski Method & Diamond Slicing", requirements: "Gas Hidrogen (H2), Gas Argon (Ar), Bahan Dopant (Fosfor/Boron)", desc: "Batangan kristal silikon raksasa silindris (ingot) diiris tipis menjadi lempengan wafer semi-konduktif.",
+                                            children: [
+                                                { id: "hs_854231", name: "Sirkuit Terpadu / Microchip (8542.31)", type: "aplikasi", desc: "Permukaan wafer silikon dicetak melalui mesin fotolitografi beresolusi nano dan di-etsa (etching) menggunakan cairan/gas asam reaktif di dalam Clean Room. Proses ini mengukir miliaran transistor mikroskopis pada sepotong kecil silikon, yang kemudian dipotong dan dirakit menjadi 'otak' (CPU/Chip) pintar untuk komputer, mobil listrik (EV), dan ponsel cerdas." }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    id: "hs_7202_si", name: "Ferro-silikon (7202.21/29)", type: "antara", process: "Submerged Arc Furnace (SAF)", requirements: "Elektroda Karbon, Scrap Baja/Besi (Sumber Fe), Kokas (Reduktor)", desc: "Logam paduan besi (iron) dan silikon hasil peleburan pasir kuarsa murni di tungku listrik raksasa bersuhu tinggi.",
+                                    children: [
+                                        { id: "app_7202_si", name: "Baja Tahan Karat & Paduan Baja", type: "aplikasi", desc: "Bongkahan paduan Ferro-silikon dilemparkan ke dalam kuali tungku lelehan baja mentah bertindak sebagai agen deoksidasi yang secara agresif menarik oksigen keluar dari cairan baja. Pembersihan oksigen ini mutlak diperlukan untuk mencegah pori-pori/gelembung di dalam struktur baja paduan otomotif maupun baja tahan karat (stainless steel)." }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            id: "hs_250620", name: "Batuan Kuarsa & Kuarsit (2506.10/20)", type: "hulu", process: "Crushing & Milling", requirements: "Jaw Crusher, Ball Mill", desc: "Bongkahan batuan padat kuarsit (hasil metamorfosis batu pasir kuarsa) dan kristal kuarsa murni.",
+                            children: [
+                                {
+                                    id: "hs_690220", name: "Bata Tahan Api Silika (6902.20)", type: "hilir", process: "Pressing & Kiln Firing", requirements: "Kapur/Lime (Sebagai pengikat mekanis)", desc: "Batu bata industri khusus berbahan silika kasar (>50% SiO2) yang dirancang untuk tidak mencair pada suhu neraka.",
+                                    children: [
+                                        { id: "app_690220", name: "Lapisan Tungku Industri Suhu Tinggi", type: "aplikasi", desc: "Batu bata silika disusun merekat membentuk dinding pelindung internal (refractory lining) pada tungku pembuatan baja raksasa (blast furnace) serta kubah oven kokas industri. Bata ini menjadi perisai utama agar baja dari kerangka luar pabrik tidak ikut meleleh akibat paparan suhu logam cair di atas 1.500 Derajat Celcius." }
+                                    ]
+                                },
+                                {
+                                    id: "hs_900190", name: "Lensa Optik & Prisma (9001.90)", type: "hilir", process: "Precision Melting & Polishing", requirements: "Tungku Oksihidrogen Bersih / Crucible Kuarsa", desc: "Kaca kuarsa murni (fused silica) tanpa gelembung yang dipotong dan digosok mikro.",
+                                    children: [
+                                        { id: "app_900190", name: "Kamera Presisi & Instrumen Lab", type: "aplikasi", desc: "Kaca kuarsa dibentuk melengkung dan digosok menggunakan bubuk abrasif nano hingga mencapai kebeningan absolut, sebelum dipasang sebagai susunan lensa penangkap gambar di satelit teleskop angkasa luar, lensa kamera sinematik, serta jendela kaca tembus pandang sinar Ultra-Violet (UV) pada mesin laboratorium spektrometer." }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            id: "hs_251200", name: "Tanah Fosil Diatomite (2512.00)", type: "hulu", process: "Drying & Calcination", desc: "Endapan cangkang fosil ganggang diatom bersel tunggal purba yang sangat berpori dan tersusun atas silika.",
+                            children: [
+                                { id: "app_251200", name: "Bahan Filtrasi Industri & Penyerap", type: "aplikasi", desc: "Serbuk diatomite dipanggang (kalsinasi) dan dituangkan ke dalam mesin saringan pabrik bertindak sebagai filter filter aid mikroskopis penahan partikel kotor. Proses ini menjernihkan produk cair mulai dari minyak goreng komersial, sirup, hingga bir gandum. Karakter porositasnya juga dicetak menjadi material pelapis penyekat panas pada pipa industri gas." }
+                            ]
+                        }
+                    ]
+                }
+            },
+            gas_alam: {
+                title: "Rantai Nilai Gas Alam & Petrokimia",
+                desc: "Hilirisasi komprehensif gas bumi mencakup jalur Syngas, Amonia, Metanol, serta Fraksionasi Olefin pembentuk plastik dan karet sintetis (60+ Node).",
+                tree: {
+                    id: "hs_2711", name: "Gas Alam / Petroleum Gases (2711)", type: "hulu", desc: "Gas bumi ekstraksi yang kaya akan metana dan hidrokarbon ringan lainnya.",
+                    children: [
+                        {
+                            id: "hs_271121", name: "Gas Alam Pipa (271121)", type: "hulu", process: "Pipa Transmisi", desc: "Gas alam yang dialirkan dalam bentuk gas.",
+                            children: [
+                                { id: "hs_280429", name: "Rare Gases / Helium (280429)", type: "antara", desc: "Helium untuk Industri Medis & Pengelasan khusus." }
+                            ]
+                        },
+                        {
+                            id: "hs_271111", name: "Gas Alam Cair / LNG (271111)", type: "hulu", process: "Liquefaction", desc: "Gas didinginkan ekstrem menjadi fase cair (LNG).",
+                            children: [
+                                {
+                                    id: "hs_280300", name: "Carbon Black (280300)", type: "hilir", process: "Incomplete Combustion", desc: "Jelaga karbon murni hitam pekat.",
+                                    children: [
+                                        { id: "app_cb", name: "Ban Otomotif & Tinta (4011, 3215)", type: "aplikasi", desc: "Penguat matriks vulkanisir karet dan pigmen tinta printer." }
+                                    ]
+                                },
+                                {
+                                    id: "hs_270500", name: "Syngas / Gas Sintesis (270500)", type: "antara", process: "Steam Methane Reforming (SMR)", requirements: "Uap Air Bertekanan (H2O), Katalis Berbasis Nikel", desc: "Campuran gas karbon monoksida (CO) dan Hidrogen murni.",
+                                    children: [
+                                        {
+                                            id: "hs_280410", name: "Hidrogen (280410)", type: "antara", desc: "Hidrogen kemurnian tinggi dari syngas.",
+                                            children: [
+                                                {
+                                                    id: "hs_281410", name: "Amonia Anhidrat (281410)", type: "antara", process: "Proses Haber-Bosch", requirements: "Gas Nitrogen (N2), Katalis Besi", desc: "Amonia tanpa air.",
+                                                    children: [
+                                                        { id: "hs_281420", name: "Larutan Amonia (281420)", type: "antara", desc: "Amonia dilarutkan dalam air (Aqueous ammonia)." },
+                                                        {
+                                                            id: "hs_280800", name: "Asam Nitrat (280800)", type: "antara", desc: "Asam nitrat pekat.",
+                                                            children: [
+                                                                { id: "hs_310230", name: "Amonium Nitrat (310230)", type: "hilir", desc: "Senyawa nitrat kaya oksigen.", children: [{ id: "app_anfo", name: "Bahan Peledak Tambang (ANFO)", type: "aplikasi", desc: "Bahan baku peledak sipil komersial untuk pertambangan." }] }
+                                                            ]
+                                                        },
+                                                        { id: "hs_310221", name: "Amonium Sulfat / ZA (310221)", type: "hilir", desc: "Pupuk ZA untuk pertanian.", children: [{ id: "app_za", name: "Pupuk Pertanian", type: "aplikasi", desc: "Disebar langsung oleh petani ke lahan tanam." }] },
+                                                        {
+                                                            id: "hs_310210", name: "Urea (310210)", type: "hilir", process: "Sintesis Urea", requirements: "Gas Karbondioksida (CO2)", desc: "Pupuk padat kaya nitrogen.",
+                                                            children: [
+                                                                { id: "app_urea", name: "Pupuk Urea Konsumen", type: "aplikasi", desc: "Nutrisi pokok sumber nitrogen tanaman pangan." },
+                                                                { id: "hs_293361", name: "Melamin (293361)", type: "aplikasi", desc: "Bahan polimer resin keras untuk pelapis meja (HPL) & piring anti-pecah." }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            id: "hs_290511", name: "Metanol (290511)", type: "antara", process: "Katalisis Bertekanan", requirements: "Katalis Tembaga/Zinc Oksida", desc: "Alkohol paling sederhana (Methyl alcohol).",
+                                            children: [
+                                                { id: "hs_291211", name: "Formaldehida (291211)", type: "hilir", desc: "Gas turunan metanol.", children: [{ id: "app_form", name: "Resin & Perekat Kayu", type: "aplikasi", desc: "Bahan utama perekat lem kayu industri lapis (plywood/MDF)." }] },
+                                                { id: "hs_291521", name: "Asam Asetat (291521)", type: "hilir", process: "Karbonilasi Metanol", desc: "Bahan penyusun asam organik.", children: [{ id: "app_pta", name: "Industri PTA & Tekstil", type: "aplikasi", desc: "Pelarut pembuatan bahan pakaian PET (Polyester)." }] }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    id: "hs_ngl", name: "Fraksi Gas NGL & Olefin", type: "antara", process: "Fractionation & Gas Cracking", requirements: "Furnace Thermal Cracking", desc: "Pemisahan gas berat (C2-C4) direngkah menjadi monomer dasar plastik.",
+                                    children: [
+                                        {
+                                            id: "hs_271114", name: "Ethane / Ethylene Mix (271114)", type: "antara", desc: "Campuran etana & etilena cair.",
+                                            children: [
+                                                {
+                                                    id: "hs_290121", name: "Etilena / Ethylene (290121)", type: "antara", desc: "Molekul C2 tak jenuh pondasi industri petrokimia.",
+                                                    children: [
+                                                        {
+                                                            id: "hs_3901", name: "Polyethylene / PE (3901)", type: "hilir", process: "Polimerisasi Katalitik", desc: "Biji plastik primer polietilena.",
+                                                            children: [
+                                                                { id: "hs_390110", name: "LDPE / LLDPE (390110)", type: "aplikasi", desc: "Dicetak menjadi botol lentur, kantong kresek, geomembran." },
+                                                                { id: "hs_390120", name: "HDPE (390120)", type: "aplikasi", desc: "Dicetak menjadi jerigen tebal, pipa air bertekanan bawah tanah." }
+                                                            ]
+                                                        },
+                                                        {
+                                                            id: "hs_290321", name: "Vinyl Chloride / VCM (290321)", type: "hilir", process: "Oksiklorinasi", requirements: "Gas Klorin (Cl2)", desc: "Monomer terhalogenasi penyusun PVC.",
+                                                            children: [
+                                                                { id: "hs_390410", name: "Plastik PVC (390410)", type: "aplikasi", desc: "Pipa Paralon perumahan, insulasi kabel listrik (8544), panel plafon." }
+                                                            ]
+                                                        },
+                                                        {
+                                                            id: "hs_290250", name: "Stirena / Styrene (290250)", type: "hilir", process: "Alkilasi Benzena", desc: "Senyawa aromatik cair berminyak.",
+                                                            children: [
+                                                                { id: "hs_390311", name: "Polystyrene EPS (390311)", type: "aplikasi", desc: "Plastik mengembang (Styrofoam) peredam kejut & insulasi panas." },
+                                                                { id: "hs_390319", name: "Solid Polystyrene (390319)", type: "aplikasi", desc: "Industri plastik kaku / wadah bening." }
+                                                            ]
+                                                        },
+                                                        {
+                                                            id: "hs_291010", name: "Ethylene Oxide (291010)", type: "antara", desc: "Turunan oksigen etilena.",
+                                                            children: [
+                                                                { id: "hs_290531", name: "Ethylene Glycol / MEG (290531)", type: "hilir", desc: "Diol penyusun Polyester.", children: [{ id: "app_meg", name: "Tekstil PET & Baju", type: "aplikasi", desc: "Dipintal menjadi benang kain Polyester." }] }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            id: "hs_271112", name: "Propana / Propane (271112)", type: "antara", desc: "Gas Propana Cair.",
+                                            children: [
+                                                {
+                                                    id: "hs_290122", name: "Propilena / Propene (290122)", type: "antara", desc: "Molekul C3 pembentuk plastik titik leleh tinggi.",
+                                                    children: [
+                                                        { id: "hs_390210", name: "Polypropylene / PP (390210)", type: "hilir", process: "Polimerisasi Ziegler-Natta", desc: "Biji plastik tangguh anti sobek.", children: [{ id: "app_pp", name: "Dashboard Otomotif & Karung", type: "aplikasi", desc: "Dashboard mobil, bumper ringan, tali kuat, lapisan masker medis." }] },
+                                                        { id: "hs_291020", name: "Propylene Oxide (291020)", type: "hilir", desc: "Bahan resin epoksi.", children: [{ id: "app_po", name: "Busa Polyurethane", type: "aplikasi", desc: "Kasur busa, insulasi jok mobil." }] },
+                                                        { id: "hs_290512", name: "Isopropanol / IPA (290512)", type: "hilir", desc: "Alkohol pelarut industri.", children: [{ id: "app_ipa", name: "Pelarut & Hand Sanitizer", type: "aplikasi", desc: "Digunakan di industri farmasi dan medis." }] },
+                                                        { id: "hs_291611", name: "Asam Akrilat (291611)", type: "aplikasi", desc: "Polimer SAP (Superabsorbent Polymer) penyerap cairan 300x untuk popok bayi." },
+                                                        { id: "hs_292610", name: "Acrylonitrile (292610)", type: "hilir", desc: "Sintesis plastik keras.", children: [{ id: "app_abs", name: "Plastik ABS / Karet NBR", type: "aplikasi", desc: "Material helm, casing elektronik, dan sarung tangan tahan minyak." }] }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            id: "hs_271113", name: "Butana / Butanes (271113)", type: "antara", desc: "Gas Butana Cair (LPG).",
+                                            children: [
+                                                { id: "hs_290123", name: "Butilena / Butene (290123)", type: "antara", desc: "Isomer C4 untuk modifikasi polimer plastik." },
+                                                {
+                                                    id: "hs_290124", name: "Butadiena & Isoprena (290124)", type: "antara", desc: "Hidrokarbon C4 berdiena.",
+                                                    children: [
+                                                        {
+                                                            id: "hs_4002", name: "Karet Sintetis (4002)", type: "hilir", process: "Kopolimerisasi Emulsi", requirements: "Campuran dengan Stirena (290250)", desc: "Pengganti getah pohon karet yang super tahan aus.",
+                                                            children: [
+                                                                { id: "hs_400211", name: "SBR Latex (400211)", type: "aplikasi", desc: "Karet cair (Lateks SBR) untuk industri pelapis dan perekat aspal." },
+                                                                { id: "hs_400219", name: "SBR Padat (400219)", type: "aplikasi", desc: "Tapak luar keras ban otomotif & sol alas kaki." },
+                                                                { id: "hs_400220", name: "Butadiene Rubber / BR (400220)", type: "aplikasi", desc: "Karet murni penahan gesekan ekstrem ban." }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+            minyak_bumi: {
+                title: "Rantai Nilai Minyak Bumi (Petroleum)",
+                desc: "Hilirisasi minyak bumi mentah menjadi bahan bakar, aspal, hingga rantai petrokimia penyusun resin plastik dan karet sintetis otomotif.",
+                tree: {
+                    id: "hs_270900", name: "Minyak Bumi Mentah (270900)", type: "hulu", process: "Pengeboran & Ekstraksi Laut Dalam", desc: "Petroleum oils and oils obtained from bituminous minerals, crude.",
+                    children: [
+                        {
+                            id: "hs_271019", name: "Distilat Menengah & Berat (271019)", type: "antara", process: "Distilasi Fraksional", desc: "Mencakup Solar/Diesel, Avtur, Kerosene, dan minyak dasar (base oil).",
+                            children: [
+                                { id: "app_bbm_berat", name: "Bahan Bakar & Biodiesel (271020)", type: "aplikasi", desc: "Konsumsi langsung untuk kendaraan diesel tugas berat, mesin kapal, dan avtur pesawat terbang." },
+                                {
+                                    id: "hs_2712", name: "Lilin Minyak Bumi (2712)", type: "hilir", process: "De-waxing Minyak Pelumas", desc: "Produk turunan dari fraksi minyak berat.",
+                                    children: [
+                                        { id: "hs_271210", name: "Petroleum Jelly / Vaseline (271210)", type: "aplikasi", desc: "Zat pelembab pelindung kulit untuk industri kosmetik dan salep farmasi." },
+                                        { id: "hs_271220", name: "Paraffin Wax (271220)", type: "aplikasi", desc: "Lilin parafin untuk industri pembuatan lilin penerangan dan pelapis kemasan tahan air." }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            id: "hs_2713", name: "Residu Minyak Bumi (2713)", type: "antara", process: "Coking & Vacuum Distillation", desc: "Sisa penyulingan paling bawah yang padat/kental.",
+                            children: [
+                                { id: "hs_271320", name: "Aspal / Bitumen (271320)", type: "aplikasi", desc: "Bahan pengikat hitam lengket utama dalam konstruksi dan pelapisan jalan raya." },
+                                {
+                                    id: "hs_271311", name: "Petcoke Mentah (271311)", type: "hilir", desc: "Kokas minyak bumi murni belum dipanggang, digunakan sebagai bahan bakar tungku pabrik semen.",
+                                    children: [
+                                        { id: "hs_271312", name: "Calcined Petcoke (271312)", type: "aplikasi", desc: "Kokas yang dipanggang (kalsinasi), krusial sebagai bahan baku pembuatan balok anoda pada smelter Elektrolisis Aluminium." }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            id: "hs_2711_lpg", name: "LPG & Gas Kilang (2711)", type: "antara", process: "Gas Recovery & Fraksionasi", desc: "Gas hidrokarbon ringan yang didinginkan hingga mencair.",
+                            children: [
+                                { id: "hs_271112", name: "Propana Cair (271112)", type: "aplikasi", desc: "Bahan bakar gas propana konsumen." },
+                                { id: "hs_271113", name: "Butana Cair (271113)", type: "aplikasi", desc: "Bahan bakar utama pada tabung kompor gas LPG dan gas propelan aerosol." }
+                            ]
+                        },
+                        {
+                            id: "hs_271012", name: "Naphtha & Light Oils (271012)", type: "antara", process: "Distilasi Fraksi Ringan", desc: "Bensin ringan (Gasoline) dan Naphtha cair, bertindak sebagai tulang punggung utama seluruh bahan petrokimia industri.",
+                            children: [
+                                {
+                                    id: "hs_aromatik", name: "Jalur Aromatik (Senyawa Cincin)", type: "antara", process: "Catalytic Reforming", desc: "Perengkahan Naphtha menjadi senyawa hidrokarbon siklik bernilai tinggi.",
+                                    children: [
+                                        {
+                                            id: "hs_290220", name: "Benzena murni (290220)", type: "antara", desc: "Senyawa dasar cincin aromatik utama berwujud cairan bening.",
+                                            children: [
+                                                { id: "hs_381700", name: "Linear Alkyl Benzene / LAB (381700)", type: "aplikasi", desc: "Bahan baku kimia aktif pemberi daya bersih pada sabun deterjen cair dan bubuk rumah tangga." },
+                                                {
+                                                    id: "hs_290270", name: "Kumena (290270)", type: "hilir", requirements: "Reaksi dengan Propilena (290122)", desc: "Cairan hidrokarbon tak berwarna turunan alkilasi benzena.",
+                                                    children: [
+                                                        { id: "hs_291411", name: "Aseton (291411)", type: "aplikasi", desc: "Bahan pelarut (solvent) kuat yang digunakan di industri plastik akrilik, lem, dan cat." },
+                                                        {
+                                                            id: "hs_290711", name: "Fenol (290711)", type: "hilir", desc: "Turunan karbolat aromatik hasil oksidasi kumena.",
+                                                            children: [
+                                                                { id: "hs_390940", name: "Resin Fenolik (390940)", type: "aplikasi", desc: "Perekat rekat tinggi antiair yang dicampurkan saat mengepres lembaran kayu menjadi Plywood (kayu lapis) komersial." },
+                                                                {
+                                                                    id: "hs_293371", name: "Epsilon-Kaprolaktam (293371)", type: "hilir", desc: "Monomer amida turunan benzena/fenol.",
+                                                                    children: [
+                                                                        { id: "hs_390810", name: "Plastik Polyamide-6 / Nylon (390810)", type: "aplikasi", desc: "Plastik tangguh dan tahan panas untuk dipintal menjadi serat benang nilon, hingga dicetak menjadi komponen gir (roda gigi) otomotif pengganti logam." }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            id: "hs_290243", name: "Para-Xilena / p-Xylene (290243)", type: "antara", desc: "Isomer xilena yang sangat reaktif dan paling berharga secara komersial.",
+                                            children: [
+                                                {
+                                                    id: "hs_291736", name: "Asam Tereftalat Murni / PTA (291736)", type: "hilir", process: "Oksidasi p-Xilena", desc: "Serbuk putih prekursor utama rantai plastik poliester.",
+                                                    children: [
+                                                        { id: "hs_390761", name: "PET Resin Botol Air (390761)", type: "aplikasi", requirements: "Reaksi dengan Ethylene Glycol / MEG (290531)", desc: "Biji plastik Polyethylene Terephthalate kental tinggi untuk dicetak-tiup (blow molding) menjadi botol air mineral dan kemasan minuman tembus pandang." },
+                                                        { id: "hs_390769", name: "Serat Polyester (390769)", type: "aplikasi", requirements: "Reaksi dengan Ethylene Glycol / MEG (290531)", desc: "Bahan dasar pembuatan kain tekstil, benang jahitan industri, dan serat pakaian sintetis tahan kusut." }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            id: "hs_290241", name: "Orto-Xilena / o-Xylene (290241)", type: "hilir", desc: "Isomer xilena struktur orto.",
+                                            children: [
+                                                { id: "hs_291735", name: "Phthalic Anhydride (291735)", type: "aplikasi", desc: "Bahan baku kunci pembuat pelentur plastik (plasticizer PVC) dan pencampur resin poliester (Fiberglass)." }
+                                            ]
+                                        },
+                                        { id: "hs_290230_44", name: "Toluena & Mixed Xylene (290230, 290244)", type: "aplikasi", desc: "Senyawa aromatik Toluena dan Xilena Campur yang umumnya dijual langsung untuk dimanfaatkan sebagai pelarut industri kelas berat pada cat, tinta, dan karet." }
+                                    ]
+                                },
+                                {
+                                    id: "hs_olefin_naphtha", name: "Jalur Olefin (Rantai Lurus)", type: "antara", process: "Steam Cracking", desc: "Perengkahan termal molekul Naphtha (serta tambahan gas propana/butana LPG) menjadi rantai gas olefin tak jenuh.",
+                                    children: [
+                                        {
+                                            id: "hs_290121", name: "Etena / Ethylene murni (290121)", type: "antara", desc: "Molekul gas etilena, blok bangunan penyusun dasar mayoritas industri plastik di dunia.",
+                                            children: [
+                                                {
+                                                    id: "hs_3901", name: "Polyethylene / PE Primer (3901)", type: "hilir", process: "Polimerisasi Etilena", desc: "Resin plastik paling banyak diproduksi berjenis Polyethylene.",
+                                                    children: [
+                                                        { id: "hs_390110", name: "LDPE / LLDPE (390110)", type: "aplikasi", desc: "Biji plastik fleksibel untuk ditiup menjadi kantong kresek tipis, film pembungkus bening, dan pelapis geomembran tahan bocor." },
+                                                        { id: "hs_390120", name: "HDPE Kepadatan Tinggi (390120)", type: "aplikasi", desc: "Plastik sangat kaku yang dicetak cetak-tiup untuk jerigen, drum bahan kimia industri, dan pipa penyalur air bertekanan di bawah tanah." }
+                                                    ]
+                                                },
+                                                {
+                                                    id: "hs_290321", name: "Vinyl Chloride / VCM (290321)", type: "hilir", requirements: "Reaksi dengan Gas Klorin (Cl2)", desc: "Monomer terhalogenasi cair sebagai prekursor tunggal plastik jenis PVC.",
+                                                    children: [
+                                                        { id: "hs_390410", name: "Resin Plastik PVC (390410)", type: "aplikasi", desc: "Bubuk resin PVC yang sangat kaku, dapat dicetak menjadi Pipa Paralon perumahan, insulasi selubung kabel listrik, hingga plafon gantung dan kusen tahan rayap." }
+                                                    ]
+                                                },
+                                                {
+                                                    id: "hs_291010", name: "Ethylene Oxide (291010)", type: "hilir", desc: "Senyawa gas epoksida turunan oksigen.",
+                                                    children: [
+                                                        { id: "hs_290531", name: "Ethylene Glycol / MEG (290531)", type: "aplikasi", desc: "Senyawa cair antibeku radiator yang juga bertindak selaku reaktan pengikat bubuk PTA di pabrik petrokimia untuk membentuk lelehan plastik PET." }
+                                                    ]
+                                                },
+                                                {
+                                                    id: "hs_290250", name: "Stirena murni / Styrene (290250)", type: "hilir", requirements: "Reaksi Etilena dengan Benzena (290220)", desc: "Monomer aromatik esensial dalam bentuk cairan berminyak.",
+                                                    children: [
+                                                        { id: "hs_390311", name: "Expansible Polystyrene / EPS (390311)", type: "aplikasi", desc: "Biji plastik yang bila dipanaskan dengan uap akan mengembang kaku menjadi busa putih (Styrofoam) peredam kejut pada kotak pendingin makanan atau alat elektronik baru." },
+                                                        { id: "hs_390319", name: "Solid Polystyrene / PS (390319)", type: "aplikasi", desc: "Plastik kaku yang dapat dibentuk jadi sangat bening, biasanya untuk wadah mika jernih dan alat makan sekali pakai." },
+                                                        { id: "hs_4002_sbr", name: "Karet Sintetis SBR (400211, 400219)", type: "aplikasi", requirements: "Campuran Stirena (290250) + Butadiena (290124)", desc: "Karet Styrene-Butadiene (berbentuk cair lateks / padat) pembuat kompon tangguh tahan aspal pada tapak luar ban mobil dan sol sepatu berat." }
+                                                    ]
+                                                },
+                                                { id: "hs_290110", name: "Saturated Hydrocarbons (290110)", type: "aplikasi", desc: "Senyawa tak jenuh sampingan (seperti heksana) yang dijual sebagai cairan pelarut ekstraksi." }
+                                            ]
+                                        },
+                                        {
+                                            id: "hs_290122", name: "Propena / Propylene murni (290122)", type: "antara", desc: "Gas olefin turunan kedua terbesar, bahan pembuat plastik yang memiliki titik lebur (meleleh) lebih tinggi daripada Polyethylene.",
+                                            children: [
+                                                { id: "hs_390210", name: "Polypropylene / Plastik PP (390210)", type: "aplikasi", desc: "Biji plastik tangguh yang dapat menahan panas sterilisasi, serta anti-sobek saat ditekuk berulang-ulang. Dicetak jadi dashboard mobil dalam, tutup botol flip, dan dipintal berserat jadi anyaman karung dan lapisan kain masker medis." },
+                                                {
+                                                    id: "hs_291020", name: "Propylene Oxide (291020)", type: "hilir", desc: "Bahan epoksida intermediet turunan propilena.",
+                                                    children: [
+                                                        { id: "hs_390950", name: "Resin Polyurethanes / PU (390950)", type: "aplikasi", desc: "Dicampur bersama bahan pengeras untuk membusa membentuk karet PU empuk kenyal pembentuk kasur tidur, pengisi jok mobil, dan bantalan sofa." }
+                                                    ]
+                                                },
+                                                { id: "hs_290512", name: "Isopropanol / Isopropyl alcohol (290512)", type: "aplikasi", desc: "Cairan murni alkohol gosok pembunuh kuman untuk cairan hand-sanitizer dan pelarut pembersih komponen di industri elektronika mikrocip." },
+                                                {
+                                                    id: "hs_292610", name: "Acrylonitrile (292610)", type: "hilir", requirements: "Reaksi dengan Amonia", desc: "Senyawa prekursor pembentuk turunan plastik keras/lentur.",
+                                                    children: [
+                                                        { id: "app_abs_nbr", name: "Plastik ABS & Serat Akrilik", type: "aplikasi", desc: "Komponen utama penyusun resin paduan plastik ABS yang ekstrem kerasnya (contoh: cangkang helm SNI dan bodi elektronik), serta bahan dasar pembuatan serat kain wol buatan (akrilik)." }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            id: "hs_290123", name: "Butilena / Butene (290123)", type: "antara", desc: "Isomer rantai C4 olefin.",
+                                            children: [
+                                                { id: "app_butene", name: "Modifikator Plastik Polimer Lanjutan", type: "aplikasi", desc: "Ditambahkan bersama Etilena untuk memodifikasi agar tingkat kelenturan plastik akhir Polyethylene (LLDPE) lebih maksimal tanpa putus (merenggang seperti karet gelang)." }
+                                            ]
+                                        },
+                                        {
+                                            id: "hs_290124", name: "Butadiena & Isoprena murni (290124)", type: "antara", desc: "Senyawa olefin cincin rangkap, prekursor utama bagi material industri karet dunia.",
+                                            children: [
+                                                {
+                                                    id: "hs_4002_br", 
+                                                    name: "Butadiene Rubber / BR Primer (400220)", 
+                                                    type: "aplikasi", 
+                                                    process: "Polimerisasi Katalis Titanium", 
+                                                    desc: "Bongkahan karet sintetis BR murni yang super kebal terhadap retak dingin maupun gesekan aspal jalanan secara langsung, digunakan khusus mencampur kompon terluar telapak ban otomotif cengkeraman tinggi."
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        };
+
+        let activeMineral = 'nikel';
+        let nodesLookup = {}; 
+        let resizeObserver;
+
+        function init() {
+            renderTabs();
+            switchMineral('nikel');
+
+            // Auto-redraw garis hanya ketika konten sudah selesai dirender secara dimensi oleh browser
+            resizeObserver = new ResizeObserver(() => {
+                if (activeMineral && industrialTrees[activeMineral]) {
+                    drawFlowchartLines(industrialTrees[activeMineral].tree);
+                }
+            });
+            resizeObserver.observe(document.getElementById('treeContent'));
+        }
+
+        function renderTabs() {
+            const container = document.getElementById('mineralTabs');
+            container.innerHTML = '';
+            Object.keys(industrialTrees).forEach(key => {
+                const btn = document.createElement('button');
+                // Flat design tab: active has bold text and dark blue bottom border
+                btn.className = `px-6 py-3 font-semibold text-xs tracking-wider uppercase border-b-2 transition-colors ${activeMineral === key ? 'border-[#051c2c] text-[#051c2c]' : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300'}`;
+                btn.innerText = key;
+                btn.onclick = () => switchMineral(key);
+                container.appendChild(btn);
+            });
+        }
+
+        function switchMineral(key) {
+            activeMineral = key;
+            nodesLookup = {};
+            renderTabs();
+            
+            const data = industrialTrees[key];
+            const header = document.getElementById('mineralHeader');
+            
+            // Clean, flat header layout
+            header.innerHTML = `
+                <div class="flex justify-between items-end gap-4 flex-wrap">
+                    <div>
+                        <h2 class="text-3xl font-serif-title text-[#051c2c]">
+                            ${data.title}
+                        </h2>
+                        <p class="mt-1 text-slate-500 text-sm max-w-2xl">${data.desc}</p>
+                    </div>
+                    <!-- Export Button: Outline Flat Design -->
+                    <button onclick="exportToExcel()" class="flex items-center gap-2 px-4 py-2 bg-white border border-[#008272] text-[#008272] text-xs font-bold uppercase tracking-wider hover:bg-[#008272] hover:text-white transition-colors flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                        Export Semua Komoditas
+                    </button>
+                </div>
+            `;
+
+            const treeContent = document.getElementById('treeContent');
+            treeContent.innerHTML = '';
+            treeContent.appendChild(renderNodeDOM(data.tree));
+            
+            resetDetail();
+        }
+
+        // Export Excel (; delimiter) untuk semua komoditas sekaligus
+        function exportToExcel() {
+            const rows = [];
+            rows.push(["Komoditas", "Level", "ID", "Nama Produk/Node", "Fase", "Proses Metalurgi", "Bahan/Katalis Pendukung", "Deskripsi"].join(";"));
+
+            function flattenTree(node, level, commodityTitle) {
+                const safeName = `"${(node.name || '').replace(/"/g, '""')}"`;
+                const safeType = `"${(node.type || '').replace(/"/g, '""')}"`;
+                const safeProcess = `"${(node.process || '').replace(/"/g, '""')}"`;
+                const safeReq = `"${(node.requirements || '').replace(/"/g, '""')}"`;
+                const safeDesc = `"${(node.desc || '').replace(/"/g, '""')}"`;
+                
+                rows.push([commodityTitle, level, node.id, safeName, safeType, safeProcess, safeReq, safeDesc].join(";"));
+                
+                if (node.children) {
+                    node.children.forEach(child => flattenTree(child, level + 1, commodityTitle));
+                }
+            }
+
+            Object.keys(industrialTrees).forEach(key => {
+                const treeData = industrialTrees[key];
+                flattenTree(treeData.tree, 1, treeData.title || key);
+            });
+
+            const blob = new Blob(["\uFEFF" + rows.join("\n")], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `McKinsey_ValueChain_All_Commodities.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function renderNodeDOM(node) {
+            nodesLookup[node.id] = node;
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = "flex items-center gap-14 my-2 relative";
+
+            const card = document.createElement('div');
+            
+            // McKinsey strict color palette classes
+            const typeStyles = {
+                hulu: 'bg-[#eafaf2] border border-[#b7e0c9] text-[#0f5132]', // Soft green for raw material
+                antara: 'bg-[#eef2ff] border border-[#c7d2fe] text-[#1e3a8a]', // Soft blue for intermediate
+                hilir: 'bg-[#eff6ff] border border-[#93c5fd] text-[#1e3a8a]', // Gentle blue for downstream
+                aplikasi: 'bg-[#ecfeff] border-2 border-[#67e8f9] text-[#134e4a]' // Soft turquoise for applications
+            };
+
+            card.className = `node-card p-3 cursor-pointer z-10 relative ${typeStyles[node.type]}`;
+            card.id = `card-${node.id}`;
+            
+            // Menghapus HS Code (angka/titik/slash dalam kurung) khusus untuk tampilan di kotak diagram
+            const displayName = (node.name || "").replace(/\s*\([0-9./a-zA-Z-]+\)/g, '');
+
+            card.innerHTML = `
+                <div class="text-sm font-semibold leading-snug">${displayName}</div>
+                ${node.process ? `<div class="mt-2 text-[9px] font-bold uppercase tracking-wider opacity-70">Proc: ${node.process}</div>` : ''}
+            `;
+            card.onclick = (e) => {
+                e.stopPropagation();
+                selectNode(node.id);
+            };
+
+            wrapper.appendChild(card);
+
+            if (node.children && node.children.length > 0) {
+                const childrenWrapper = document.createElement('div');
+                childrenWrapper.className = "flex flex-col justify-center gap-4 py-2 relative";
+                
+                node.children.forEach(child => {
+                    childrenWrapper.appendChild(renderNodeDOM(child));
+                });
+
+                wrapper.appendChild(childrenWrapper);
+            }
+
+            return wrapper;
+        }
+
+        function drawFlowchartLines(rootNode) {
+            const svgPaths = document.getElementById('svgPaths');
+            if (!svgPaths) return;
+
+            // Hapus jalur lama secara aman tanpa merusak struktur elemen <defs>
+            while (svgPaths.firstChild) {
+                svgPaths.removeChild(svgPaths.firstChild);
+            }
+            
+            function draw(node) {
+                if (!node.children || node.children.length === 0) return;
+                const parentEl = document.getElementById(`card-${node.id}`);
+                if (!parentEl) return;
+
+                node.children.forEach(child => {
+                    const childEl = document.getElementById(`card-${child.id}`);
+                    if (!childEl) return;
+
+                    const getOffset = (el) => {
+                        const rect = el.getBoundingClientRect();
+                        const wrapperRect = document.getElementById('flowWrapper').getBoundingClientRect();
+                        return {
+                            top: rect.top - wrapperRect.top,
+                            left: rect.left - wrapperRect.left,
+                            width: rect.width,
+                            height: rect.height
+                        };
+                    };
+
+                    const pRect = getOffset(parentEl);
+                    const cRect = getOffset(childEl);
+
+                    const startX = pRect.left + pRect.width;
+                    const startY = pRect.top + (pRect.height / 2);
+                    const endX = cRect.left;
+                    const endY = cRect.top + (cRect.height / 2);
+
+                    const dx = (endX - startX) / 2;
+
+                    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                    // Menggambar kurva Bezier halus dari kotak parent ke child
+                    const d = `M ${startX} ${startY} C ${startX + dx} ${startY}, ${endX - dx} ${endY}, ${endX - 4} ${endY}`;
+                    
+                    path.setAttribute("d", d);
+                    path.setAttribute("fill", "none");
+                    path.setAttribute("stroke", "#94a3b8");
+                    path.setAttribute("stroke-width", "1.5");
+                    path.setAttribute("marker-end", "url(#arrowhead)");
+                    
+                    svgPaths.appendChild(path);
+
+                    draw(child);
+                });
+            }
+            
+            draw(rootNode);
+        }
+
+        function selectNode(id) {
+            document.querySelectorAll('.node-card').forEach(el => el.classList.remove('node-active'));
+            document.getElementById(`card-${id}`).classList.add('node-active');
+
+            const node = nodesLookup[id];
+            const panel = document.getElementById('detailPanel');
+            
+            const typeLabels = {
+                hulu: 'Hulu (Raw Material)',
+                antara: 'Industri Antara (Intermediate)',
+                hilir: 'Produk Hilir',
+                aplikasi: 'Aplikasi Akhir (End-Use)'
+            };
+
+            const typeColors = {
+                hulu: 'text-[#0f5132] border-[#b7e0c9]',
+                antara: 'text-[#1e3a8a] border-[#c7d2fe]',
+                hilir: 'text-[#1e3a8a] border-[#93c5fd]',
+                aplikasi: 'text-[#134e4a] border-[#67e8f9]'
+            };
+
+            // Check if trade data exists for this node
+            const hasTradeData = tradeData[id] !== undefined;
+            
+            // Callout box style panel content
+            panel.innerHTML = `
+                <div class="animate-in fade-in duration-200">
+                    <div class="inline-block px-2 py-1 border text-[9px] font-bold uppercase tracking-widest mb-4 ${typeColors[node.type]}">
+                        ${typeLabels[node.type]}
+                    </div>
+                    
+                    <h3 class="text-2xl font-serif-title text-[#051c2c] mb-4">${node.name}</h3>
+                    
+                    ${node.process ? `
+                        <div class="mb-4">
+                            <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200 pb-1 mb-1">Teknologi Pemrosesan</span>
+                            <span class="text-sm text-[#051c2c] font-medium">${node.process}</span>
+                        </div>
+                    ` : ''}
+
+                    ${node.requirements ? `
+                        <div class="mb-5 bg-slate-50 p-3 border border-slate-200 rounded-sm">
+                            <span class="block text-[10px] font-bold text-[#008272] uppercase tracking-wider border-b border-[#008272]/20 pb-1 mb-1">Bahan Baku & Katalis Pendukung</span>
+                            <span class="text-xs text-slate-700 font-medium leading-relaxed">${node.requirements}</span>
+                        </div>
+                    ` : ''}
+
+                    <div class="mb-6">
+                        <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200 pb-1 mb-2">${node.type === 'aplikasi' ? 'Peran Komponen dalam Aplikasi Akhir' : 'Deskripsi Produk'}</span>
+                        <p class="text-sm text-slate-600 leading-relaxed">
+                            ${node.desc || 'Data tidak tersedia.'}
+                        </p>
+                    </div>
+
+                    ${hasTradeData ? `
+                        <div class="mb-6 bg-gradient-to-r from-[#008272]/10 to-[#051c2c]/10 p-4 border border-[#008272]/30 rounded-sm">
+                            <button onclick="openTradeModal('${id}')" class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-[#008272] text-white text-xs font-bold uppercase tracking-wider hover:bg-[#005a52] transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                Lihat Track Record Ekspor-Impor
+                            </button>
+                        </div>
+                    ` : ''}
+
+                    ${node.children && node.children.length > 0 ? `
+                        <div class="mt-8">
+                            <span class="block text-[10px] font-bold text-[#008272] uppercase tracking-wider mb-3">
+                                Menghasilkan Turunan Berikutnya
+                            </span>
+                            <div class="space-y-2 border-l-2 border-[#008272] pl-3">
+                                ${node.children.map(c => `
+                                    <div onclick="selectNode('${c.id}')" class="text-sm text-slate-700 hover:text-[#008272] font-medium cursor-pointer transition-colors flex items-center gap-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                                        ${c.name}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function resetDetail() {
+            document.getElementById('detailPanel').innerHTML = `
+                <div class="h-full flex flex-col items-center justify-center text-center text-slate-400 space-y-4 py-12">
+                    <svg class="w-10 h-10 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                        <rect x="3" y="3" width="18" height="18" rx="0" ry="0"></rect>
+                        <line x1="3" y1="9" x2="21" y2="9"></line>
+                        <line x1="9" y1="21" x2="9" y2="9"></line>
+                    </svg>
+                    <p class="text-xs">Pilih node pada diagram untuk melihat bahan katalis dan detail teknis.</p>
+                </div>
+            `;
+        }
+
+        // ==================== TRADE DATA STRUCTURE ====================
+        // Data struktur untuk tracking ekspor/impor per HS code per tahun
+        const tradeData = {
+            // Nikel
+            'hs_2604': {
+                name: 'Nickel Ore Laterite (2604)',
+                hsCode: '2604',
+                data: {
+                    years: [2019, 2020, 2021, 2022, 2023, 2024],
+                    indonesiaExportValue: [5200, 4800, 6100, 7200, 8900, 9500], // ribu dolar
+                    indonesiaExportQty: [12.5, 11.2, 15.3, 18.0, 22.1, 23.5], // juta ton
+                    indonesiaImportValue: [320, 280, 450, 580, 720, 850], // ribu dolar
+                    indonesiaImportQty: [0.8, 0.6, 1.1, 1.4, 1.8, 2.1], // ribu ton
+                    worldImportValue: [8900, 8200, 10500, 12800, 14200, 15100], // ribu dolar
+                    worldImportQty: [42.3, 39.5, 52.1, 63.4, 70.5, 75.2] // juta ton
+                }
+            },
+            'hs_7501': {
+                name: 'Nickel Matte & NPI (7501)',
+                hsCode: '7501',
+                data: {
+                    years: [2019, 2020, 2021, 2022, 2023, 2024],
+                    indonesiaExportValue: [2800, 2500, 3200, 4100, 5200, 5800],
+                    indonesiaExportQty: [0.6, 0.5, 0.8, 1.0, 1.3, 1.5],
+                    indonesiaImportValue: [420, 380, 520, 680, 850, 1050],
+                    indonesiaImportQty: [0.1, 0.08, 0.12, 0.15, 0.19, 0.23],
+                    worldImportValue: [5200, 4900, 6100, 7500, 8800, 9500],
+                    worldImportQty: [1.2, 1.1, 1.5, 1.9, 2.2, 2.4]
+                }
+            },
+            'hs_7502': {
+                name: 'Refined Nickel / Katoda (7502)',
+                hsCode: '7502',
+                data: {
+                    years: [2019, 2020, 2021, 2022, 2023, 2024],
+                    indonesiaExportValue: [1200, 1100, 1500, 2000, 2800, 3200],
+                    indonesiaExportQty: [0.08, 0.07, 0.10, 0.13, 0.19, 0.22],
+                    indonesiaImportValue: [850, 920, 1100, 1350, 1680, 1950],
+                    indonesiaImportQty: [0.06, 0.065, 0.08, 0.10, 0.12, 0.14],
+                    worldImportValue: [12500, 11800, 14200, 17000, 19500, 21000],
+                    worldImportQty: [0.85, 0.80, 0.97, 1.15, 1.32, 1.42]
+                }
+            },
+            'hs_2603': {
+                name: 'Copper Concentrate (2603)',
+                hsCode: '2603',
+                data: {
+                    years: [2019, 2020, 2021, 2022, 2023, 2024],
+                    indonesiaExportValue: [150, 180, 220, 280, 380, 450],
+                    indonesiaExportQty: [0.3, 0.4, 0.5, 0.6, 0.8, 1.0],
+                    indonesiaImportValue: [1200, 1400, 1600, 1950, 2300, 2650],
+                    indonesiaImportQty: [2.5, 2.9, 3.2, 3.9, 4.6, 5.3],
+                    worldImportValue: [18000, 17200, 21500, 25800, 28900, 31200],
+                    worldImportQty: [28.5, 27.3, 34.2, 41.0, 46.0, 49.7]
+                }
+            },
+            'hs_7403': {
+                name: 'Refined Cathodes (7403)',
+                hsCode: '7403',
+                data: {
+                    years: [2019, 2020, 2021, 2022, 2023, 2024],
+                    indonesiaExportValue: [420, 380, 550, 720, 950, 1100],
+                    indonesiaExportQty: [0.05, 0.04, 0.06, 0.08, 0.11, 0.13],
+                    indonesiaImportValue: [2100, 2300, 2800, 3400, 4100, 4800],
+                    indonesiaImportQty: [0.25, 0.27, 0.33, 0.40, 0.48, 0.56],
+                    worldImportValue: [28000, 26500, 32500, 39000, 44000, 48500],
+                    worldImportQty: [3.2, 3.0, 3.8, 4.5, 5.1, 5.6]
+                }
+            },
+            'hs_2606': {
+                name: 'Bauksit / Bauxite (2606)',
+                hsCode: '2606',
+                data: {
+                    years: [2019, 2020, 2021, 2022, 2023, 2024],
+                    indonesiaExportValue: [8500, 7900, 9200, 11000, 13500, 15200],
+                    indonesiaExportQty: [21.0, 19.5, 22.8, 27.0, 33.2, 37.5],
+                    indonesiaImportValue: [180, 220, 280, 350, 420, 550],
+                    indonesiaImportQty: [0.4, 0.5, 0.6, 0.8, 1.0, 1.3],
+                    worldImportValue: [12000, 11200, 13800, 16500, 19200, 21500],
+                    worldImportQty: [32.5, 30.8, 37.9, 45.2, 52.1, 58.3]
+                }
+            },
+            'hs_281820': {
+                name: 'Alumina / Aluminium Oksida (281820)',
+                hsCode: '281820',
+                data: {
+                    years: [2019, 2020, 2021, 2022, 2023, 2024],
+                    indonesiaExportValue: [450, 380, 520, 680, 890, 1050],
+                    indonesiaExportQty: [0.8, 0.7, 0.9, 1.2, 1.5, 1.8],
+                    indonesiaImportValue: [2800, 3100, 3700, 4500, 5300, 6200],
+                    indonesiaImportQty: [5.2, 5.8, 6.9, 8.3, 9.8, 11.5],
+                    worldImportValue: [22000, 20800, 25500, 30800, 35200, 38900],
+                    worldImportQty: [45.3, 42.9, 52.7, 63.5, 72.8, 81.2]
+                }
+            },
+            'hs_7601': {
+                name: 'Unwrought Aluminium Ingot (7601)',
+                hsCode: '7601',
+                data: {
+                    years: [2019, 2020, 2021, 2022, 2023, 2024],
+                    indonesiaExportValue: [380, 320, 450, 600, 820, 950],
+                    indonesiaExportQty: [0.15, 0.13, 0.18, 0.24, 0.33, 0.38],
+                    indonesiaImportValue: [3200, 3600, 4200, 5100, 6000, 7100],
+                    indonesiaImportQty: [0.8, 0.9, 1.05, 1.28, 1.50, 1.78],
+                    worldImportValue: [18500, 17200, 21000, 25200, 28500, 31500],
+                    worldImportQty: [2.2, 2.0, 2.5, 3.0, 3.4, 3.8]
+                }
+            }
+        };
+
+        // ==================== MODAL & CHART FUNCTIONS ====================
+        let currentCharts = [];
+
+        function openTradeModal(nodeId) {
+            const tradeInfo = tradeData[nodeId];
+            if (!tradeInfo) {
+                // Jika tidak ada data, tampilkan pesan
+                alert('Data perdagangan belum tersedia untuk node ini.');
+                return;
+            }
+
+            const modal = document.getElementById('tradeModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalContent = document.getElementById('modalContent');
+            
+            modalTitle.textContent = tradeInfo.name + ' (HS Code: ' + tradeInfo.hsCode + ')';
+            
+            // Replace with new 3-column layout
+            modalContent.innerHTML = `
+                <div class="mb-4 text-sm text-slate-600">
+                    Grafik berikut menampilkan Rekam Jejak Nilai dan Kuantitas Ekspor/Impor Indonesia, serta Impor Dunia terpisah.
+                </div>
+                <div class="grid gap-6 lg:grid-cols-3">
+                    <div id="idChartContainer" class="relative h-72 bg-white rounded-xl border border-slate-200 p-3"></div>
+                    <div id="worldChartContainer" class="relative h-72 bg-white rounded-xl border border-slate-200 p-3"></div>
+                    <div id="qtyChartContainer" class="relative h-72 bg-white rounded-xl border border-slate-200 p-3"></div>
+                </div>
+                <div id="priceSummary" class="mt-6 bg-slate-50 rounded-xl border border-slate-200 p-4 text-sm text-slate-700"></div>
+            `;
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            // Render all three charts
+            showTradeChart(nodeId);
+        }
+
+        function closeTradeModal() {
+            const modal = document.getElementById('tradeModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            currentCharts.forEach(chart => chart.destroy());
+            currentCharts = [];
+        }
+
+        function showTradeChart(nodeId) {
+            const tradeInfo = getTradeDataByNodeId(nodeId);
+            if (!tradeInfo) return;
+
+            const idChartContainer = document.getElementById('idChartContainer');
+            const worldChartContainer = document.getElementById('worldChartContainer');
+            const qtyChartContainer = document.getElementById('qtyChartContainer');
+            const priceSummary = document.getElementById('priceSummary');
+            const data = tradeInfo.data;
+            const years = data.years || Array.from({ length: data.indonesiaExportValue.length }, (_, i) => 2006 + i);
+
+            const idValueDatasets = [
+                {
+                    label: 'Ekspor Indonesia (Ribu Dolar)',
+                    data: data.indonesiaExportValue,
+                    borderColor: '#008272',
+                    backgroundColor: '#00827233',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    pointBackgroundColor: '#008272',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2
+                },
+                {
+                    label: 'Impor Indonesia (Ribu Dolar)',
+                    data: data.indonesiaImportValue,
+                    borderColor: '#dc2626',
+                    backgroundColor: '#dc262633',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    pointBackgroundColor: '#dc2626',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2
+                }
+            ];
+
+            const worldValueDatasets = [
+                {
+                    label: 'Impor Dunia (Ribu Dolar)',
+                    data: data.worldImportValue,
+                    borderColor: '#7c3aed',
+                    backgroundColor: '#7c3aed33',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    pointBackgroundColor: '#7c3aed',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2
+                }
+            ];
+
+            const qtyDatasets = [
+                {
+                    label: 'Kuantitas Ekspor Indonesia',
+                    data: data.indonesiaExportQty,
+                    borderColor: '#0f766e',
+                    backgroundColor: '#0f766e33',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    pointBackgroundColor: '#0f766e',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2
+                },
+                {
+                    label: 'Kuantitas Impor Indonesia',
+                    data: data.indonesiaImportQty,
+                    borderColor: '#991b1b',
+                    backgroundColor: '#991b1b33',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    pointBackgroundColor: '#991b1b',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2
+                }
+            ];
+
+            if (currentCharts.length) {
+                currentCharts.forEach(chart => chart.destroy());
+                currentCharts = [];
+            }
+
+            idChartContainer.innerHTML = '<canvas id="tradeIdChart"></canvas>';
+            worldChartContainer.innerHTML = '<canvas id="tradeWorldChart"></canvas>';
+            qtyChartContainer.innerHTML = '<canvas id="tradeQtyChart"></canvas>';
+
+            const idCtx = document.getElementById('tradeIdChart').getContext('2d');
+            const worldCtx = document.getElementById('tradeWorldChart').getContext('2d');
+            const qtyCtx = document.getElementById('tradeQtyChart').getContext('2d');
+
+            currentCharts.push(new Chart(idCtx, {
+                type: 'line',
+                data: { labels: years, datasets: idValueDatasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: true, position: 'top', labels: { font: { size: 12, weight: 'bold' }, color: '#333333', padding: 15 } },
+                        tooltip: { backgroundColor: 'rgba(5, 28, 44, 0.8)', padding: 12, titleFont: { size: 13, weight: 'bold' }, bodyFont: { size: 12 }, borderColor: '#334155', borderWidth: 2, cornerRadius: 4, callbacks: { label: function(context) { let label = context.dataset.label || ''; if (label) { label += ': '; } if (context.parsed.y !== null) { label += new Intl.NumberFormat('id-ID').format(Math.round(context.parsed.y)); } return label; } } }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 11 }, color: '#64748b' }, title: { display: true, text: 'Nilai (Ribu Dolar)', font: { size: 12, weight: 'bold' } } },
+                        x: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#64748b' }, title: { display: true, text: 'Tahun', font: { size: 12, weight: 'bold' } } }
+                    }
+                }
+            }));
+
+            currentCharts.push(new Chart(worldCtx, {
+                type: 'line',
+                data: { labels: years, datasets: worldValueDatasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: true, position: 'top', labels: { font: { size: 12, weight: 'bold' }, color: '#333333', padding: 15 } },
+                        tooltip: { backgroundColor: 'rgba(5, 28, 44, 0.8)', padding: 12, titleFont: { size: 13, weight: 'bold' }, bodyFont: { size: 12 }, borderColor: '#334155', borderWidth: 2, cornerRadius: 4, callbacks: { label: function(context) { let label = context.dataset.label || ''; if (label) { label += ': '; } if (context.parsed.y !== null) { label += new Intl.NumberFormat('id-ID').format(Math.round(context.parsed.y)); } return label; } } }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 11 }, color: '#64748b' }, title: { display: true, text: 'Nilai (Ribu Dolar)', font: { size: 12, weight: 'bold' } } },
+                        x: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#64748b' }, title: { display: true, text: 'Tahun', font: { size: 12, weight: 'bold' } } }
+                    }
+                }
+            }));
+
+            currentCharts.push(new Chart(qtyCtx, {
+                type: 'line',
+                data: { labels: years, datasets: qtyDatasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: true, position: 'top', labels: { font: { size: 12, weight: 'bold' }, color: '#333333', padding: 15 } },
+                        tooltip: { backgroundColor: 'rgba(5, 28, 44, 0.8)', padding: 12, titleFont: { size: 13, weight: 'bold' }, bodyFont: { size: 12 }, borderColor: '#334155', borderWidth: 2, cornerRadius: 4, callbacks: { label: function(context) { let label = context.dataset.label || ''; if (label) { label += ': '; } if (context.parsed.y !== null) { label += new Intl.NumberFormat('id-ID').format(Math.round(context.parsed.y)); } return label; } } }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 11 }, color: '#64748b' }, title: { display: true, text: 'Kuantitas', font: { size: 12, weight: 'bold' } } },
+                        x: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#64748b' }, title: { display: true, text: 'Tahun', font: { size: 12, weight: 'bold' } } }
+                    }
+                }
+            }));
+
+            priceSummary.innerHTML = renderPriceSummary(data, years);
+        }
+
+        function getLastNonZeroPrice(prices) {
+            for (let i = prices.length - 1; i >= 0; i--) {
+                if (prices[i] && prices[i] > 0) {
+                    return prices[i];
+                }
+            }
+            return null;
+        }
+
+        function renderPriceSummary(data, years) {
+            if (!data || !data.price || data.price.length === 0) {
+                return '<p class="text-slate-500">Harga tidak tersedia untuk produk ini.</p>';
+            }
+
+            const latestYear = years[years.length - 1];
+            const latestPrice = data.price[data.price.length - 1];
+            const effectivePrice = latestPrice && latestPrice > 0 ? latestPrice : getLastNonZeroPrice(data.price);
+
+            if (!effectivePrice) {
+                return '<p class="text-slate-500">Harga tidak tersedia untuk produk ini.</p>';
+            }
+
+            const formattedPrice = new Intl.NumberFormat('id-ID', { 
+                style: 'currency', 
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(effectivePrice);
+
+            const priceSource = latestPrice && latestPrice > 0 ? `(${latestYear})` : `(Last available: ${years.find((_, i) => data.price[i] && data.price[i] > 0) || '—'})`;
+
+            return `
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">💰</span>
+                        <div>
+                            <p class="text-xs font-semibold text-slate-500 uppercase">Harga Rata-rata</p>
+                            <p class="text-xl font-bold text-[#051c2c]">${effectivePrice.toLocaleString('id-ID', { maximumFractionDigits: 2 })}</p>
+                            <p class="text-xs text-slate-500">${priceSource}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">📊</span>
+                        <div>
+                            <p class="text-xs font-semibold text-slate-500 uppercase">Min - Max</p>
+                            <p class="text-sm text-[#051c2c]">${Math.min(...data.price.filter(p => p > 0)).toLocaleString('id-ID', { maximumFractionDigits: 2 })} - ${Math.max(...data.price).toLocaleString('id-ID', { maximumFractionDigits: 2 })}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">📈</span>
+                        <div>
+                            <p class="text-xs font-semibold text-slate-500 uppercase">Perubahan Tahun</p>
+                            <p class="text-sm text-[#051c2c]">${latestYear}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        window.onload = init;
+    </script>
+    
+    <!-- MODAL: Trade Data Display -->
+    <div id="tradeModal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-3xl w-full max-h-[90vh] overflow-auto shadow-2xl">
+            <!-- Header -->
+            <div class="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+                <div>
+                    <h2 id="modalTitle" class="text-2xl font-serif-title text-[#051c2c]"></h2>
+                    <p class="text-sm text-slate-500 mt-1">Track Record Ekspor-Impor per Tahun</p>
+                </div>
+                <button onclick="closeTradeModal()" class="text-slate-400 hover:text-[#051c2c] transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Content -->
+            <div id="modalContent" class="p-6">
+                <!-- Tabs dan Chart akan dirender di sini -->
+            </div>
+        </div>
+    </div>
+</body>
+</html>
